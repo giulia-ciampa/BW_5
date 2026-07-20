@@ -1,5 +1,7 @@
 package team6.BW_5.services;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import team6.BW_5.entities.Utente;
 import team6.BW_5.repositories.UtenteRepository;
@@ -11,9 +13,9 @@ import java.util.UUID;
 public class UtenteService {
     private UtenteRepository utenteRepository;
 
-    //metodo per tornare lista di utenti
-    public List<Utente> findAll() {
-        return utenteRepository.findAll();
+    //metodo per tornare lista di utenti con paginazione inclusa da usare nel getmapping del controller
+    public Page<Utente> findAll(Pageable pageable) {
+        return utenteRepository.findAll(pageable);
     }
 
     // findById
@@ -52,4 +54,6 @@ public class UtenteService {
 
         return utenteRepository.save(utenteEsistente);
     }
+
+
 }
