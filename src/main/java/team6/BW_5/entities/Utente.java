@@ -18,13 +18,13 @@ import java.util.UUID;
 @NoArgsConstructor
 @ToString
 public class Utente {
-   @Id
-   @GeneratedValue(strategy = GenerationType.AUTO)
-   private UUID id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private UUID id;
 
-   @NotBlank(message = "Lo username è obbligatorio!")
-   @Size(min = 3, max = 20, message = "Lo username deve avere una lunghezza compresa tra 3 e 20 caratteri!")
-   @Column(nullable = false, unique = true)
+    @NotBlank(message = "Lo username è obbligatorio!")
+    @Size(min = 3, max = 20, message = "Lo username deve avere una lunghezza compresa tra 3 e 20 caratteri!")
+    @Column(nullable = false, unique = true)
     private String username;
 
     @NotBlank(message = "L'email è obbligatoria")

@@ -1,11 +1,13 @@
 package team6.BW_5.services;
 
+import org.springframework.stereotype.Service;
 import team6.BW_5.entities.Utente;
 import team6.BW_5.repositories.UtenteRepository;
 
 import java.util.List;
 import java.util.UUID;
 
+@Service
 public class UtenteService {
     private UtenteRepository utenteRepository;
 
