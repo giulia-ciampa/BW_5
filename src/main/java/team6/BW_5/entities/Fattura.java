@@ -30,17 +30,22 @@ public class Fattura {
     @Column(nullable = false, unique = true)
     private long numero;
 
-    @JoinColumn(name = "stato_id", nullable = false)
     @ManyToOne
+    @JoinColumn(name = "stato_id", nullable = false)
     private StatoFattura stato;
 
-    //JoinColumn(name="id_cliente", nullable=false)
-    //@ManyToOne
-    //private Cliente cliente;
+    @ManyToOne
+    @JoinColumn(name = "id_cliente", nullable = false)
+    private Cliente cliente;
 
     //COSTRUTTORE
 
-    public Fattura(LocalDate data, double importo, long numero, StatoFattura statoFattura) {
+    public Fattura(LocalDate data, double importo, long numero, StatoFattura stato, Cliente cliente) {
+        this.data = data;
+        this.importo = importo;
+        this.numero = numero;
+        this.stato = stato;
+        this.cliente = cliente;
     }
 
 
