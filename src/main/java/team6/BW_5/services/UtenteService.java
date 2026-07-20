@@ -38,6 +38,18 @@ public class UtenteService {
         utenteRepository.delete(utente);
     }
 
+    //metodo per aggiornare utente
+    public Utente utenteAggiornato(UUID id, Utente utenteModificato) {
+        Utente utenteEsistente = findById(id);
 
+        // setto i dati utente
+        utenteEsistente.setNome(utenteModificato.getNome());
+        utenteEsistente.setCognome(utenteModificato.getCognome());
+        utenteEsistente.setEmail(utenteModificato.getEmail());
+        utenteEsistente.setUsername(utenteModificato.getUsername());
+        utenteEsistente.setAvatar(utenteModificato.getAvatar());
+        utenteEsistente.setPassword(utenteModificato.getPassword());
 
+        return utenteRepository.save(utenteEsistente);
+    }
 }
