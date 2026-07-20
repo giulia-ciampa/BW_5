@@ -16,7 +16,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @NoArgsConstructor
-@ToStringgit branch
+@ToString
 public class Utente {
    @Id
    @GeneratedValue(strategy = GenerationType.AUTO)
