@@ -11,6 +11,7 @@ import team6.BW_5.repositories.AssegnazioneRuoloRepository;
 import team6.BW_5.repositories.RuoloUtenteRepository;
 
 import java.time.LocalDate;
+import java.util.List;
 
 
 @Service
@@ -52,8 +53,12 @@ public class AssegnazioneRuoloService {
         return assegnazioneRuoloRepository.save(assegnazione);
     }
 
-    // Storico paginato delle assegnazioni di un utente
-    public Page<AssegnazioneRuolo> trovaPerUtentePaginato(Utente utente, Pageable pageable) {
-        return assegnazioneRuoloRepository.findByUtente(utente, pageable);
+    public List<RuoloUtente> trovaRuoliAttiviPerUtente(Utente utente) {
+        List<AssegnazioneRuolo> assegnazioniAttive = assegnazioneRuoloRepository.findByUtenteAndDataRevocaIsNull(utente);
+        //  lista dei ruoli effettivi dalle assegnazioni attive
+        return assegnazioniAttive.stream()
+                .map(AssegnazioneRuolo::getRuolo)
+                .toList();
     }
+
 }
