@@ -1,6 +1,7 @@
 package team6.BW_5.exceptions;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -40,6 +41,15 @@ public class ErrorsHandler {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorsDTO handleGenericException(Exception e) {
         return new ErrorsDTO("Al momento il server non risponde", LocalDateTime.now());
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorsDTO handleHttpMessageNotReadable(HttpMessageNotReadableException e) {
+        return new ErrorsDTO(
+                "Formato della data non valido. Inserisci la data nel formato europeo GG/MM/AAAA (es. 21/07/2026)",
+                LocalDateTime.now()
+        );
     }
 
     @ExceptionHandler(RuntimeException.class)
