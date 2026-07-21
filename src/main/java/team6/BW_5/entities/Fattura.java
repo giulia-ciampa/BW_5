@@ -27,6 +27,7 @@ public class Fattura {
     @Column(nullable = false)
     private double importo;
 
+    
     @Column(nullable = false)
     private long numero;
 

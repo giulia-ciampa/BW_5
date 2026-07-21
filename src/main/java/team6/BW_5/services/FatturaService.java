@@ -26,6 +26,7 @@ public class FatturaService {
     private final StatoFatturaRepository statoFatturaRepository;
     private final StatoFatturaService statoFatturaService;
 
+
     public FatturaService(FatturaRepository fatturaRepository, ClienteRepository clienteRepository, StatoFatturaRepository statoFatturaRepository, StatoFatturaService statoFatturaService) {
         this.fatturaRepository = fatturaRepository;
         this.clienteRepository = clienteRepository;
@@ -82,5 +83,19 @@ public class FatturaService {
         return fatturaTrovata;
     }
 
-    
+    //UPDATE
+    public Fattura updateFattura(UUID id, FatturaDTO payload) {
+        Fattura fatturaTrovata = findById(id);
+
+        fatturaTrovata.setData(payload.data());
+        fatturaTrovata.setImporto(payload.importo());
+
+        Cliente clienteTrovato = clienteRepository.findById(payload.idCliente()).orElseThrow(() -> new NotFoundException("il cliente con id " + payload.idCliente() + " non è stato trovato"));
+        fatturaTrovata.setCliente(clienteTrovato);
+
+        return fatturaRepository.save(fatturaTrovata);
+
+    }
+
+
 }

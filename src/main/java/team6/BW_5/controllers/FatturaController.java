@@ -58,4 +58,18 @@ public class FatturaController {
         Fattura fatturaTrovata = fatturaService.findById(idFattura);
         return fatturaTrovata;
     }
+
+
+    // UPDATE FATTURA
+    @PutMapping("/{idFattura}")
+    public Fattura updateFattura(@PathVariable UUID idFattura,
+                                 @RequestBody @Validated FatturaDTO body,
+                                 BindingResult validationResult) {
+        if (validationResult.hasErrors()) {
+            throw new ValidationException(validationResult.getFieldErrors().stream()
+                    .map(DefaultMessageSourceResolvable::getDefaultMessage).toList());
+        }
+
+        return fatturaService.updateFattura(idFattura, body);
+    }
 }
