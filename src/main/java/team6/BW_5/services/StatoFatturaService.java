@@ -11,11 +11,12 @@ public class StatoFatturaService {
         this.statoFatturaRepository = statoFatturaRepository;
     }
 
-    public StatoFattura trovaOAlimentaStato(String stato) {
-        return statoFatturaRepository.findByStato(stato).orElseGet(() -> {
-            StatoFattura nuovoStato = new StatoFattura();
-            nuovoStato.setStato(stato);
-            return statoFatturaRepository.save(nuovoStato);
-        });
+    public StatoFattura salvaEmissioneFattura() {
+        return statoFatturaRepository.findByStato("EMESSA")
+                .orElseGet(() -> {
+                    StatoFattura nuovoStato = new StatoFattura();
+                    nuovoStato.setStato("EMESSA");
+                    return statoFatturaRepository.save(nuovoStato);
+                });
     }
 }
