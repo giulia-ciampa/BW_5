@@ -12,6 +12,7 @@ import team6.BW_5.services.AssegnazioneRuoloService;
 import team6.BW_5.services.RuoloUtenteService;
 import team6.BW_5.services.UtenteService;
 
+import java.util.List;
 import java.util.UUID;
 
 
@@ -44,9 +45,10 @@ public class AssegnazioneRuoloController {
     }
 
     //storico dei ruoli assegnati ad un utente
-    @GetMapping("/utente/{idUtente}")
-    public Page<AssegnazioneRuolo> storicoRuoliPerUtente(@PathVariable UUID idUtente, Pageable pageable) {
+    @GetMapping("/utente/{idUtente}/attivi")
+    public List<RuoloUtente> getRuoliAttiviPerUtente(@PathVariable UUID idUtente) {
         Utente utente = utenteService.findById(idUtente);
-        return assegnazioneRuoloService.trovaPerUtentePaginato(utente, pageable);
+        return assegnazioneRuoloService.trovaRuoliAttiviPerUtente(utente);
     }
+
 }
