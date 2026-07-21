@@ -133,4 +133,13 @@ public class ClienteService {
         return clienteRepository.save(cliente);
 
     }
+
+    public void deleteOwnCliente(Utente utenteAutenticato, UUID clienteId) {
+        Cliente cliente = findById(clienteId);
+
+        if (!utenteAutenticato.getUtenteId().equals(cliente.getUtente().getUtenteId()))
+            throw new UnauthorizedException("Non possiedi l'autorizzazione per cancellare questo cliente.");
+
+        clienteRepository.delete(cliente);
+    }
 }

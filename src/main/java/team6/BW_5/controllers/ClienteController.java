@@ -63,4 +63,10 @@ public class ClienteController {
         return clienteService.updateCliente(body, utente, clienteId);
     }
 
+    @DeleteMapping("/me/{clienteId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteOwnCliente(@AuthenticationPrincipal Utente utenteAutenticato, @PathVariable UUID clienteId) {
+        clienteService.deleteOwnCliente(utenteAutenticato, clienteId);
+    }
+
 }
