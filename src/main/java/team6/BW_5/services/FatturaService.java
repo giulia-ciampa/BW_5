@@ -1,5 +1,7 @@
 package team6.BW_5.services;
 
+import jakarta.transaction.Transactional;
+import org.springframework.stereotype.Service;
 import team6.BW_5.entities.Cliente;
 import team6.BW_5.entities.Fattura;
 import team6.BW_5.entities.StatoFattura;
@@ -8,10 +10,10 @@ import team6.BW_5.repositories.ClienteRepository;
 import team6.BW_5.repositories.FatturaRepository;
 import team6.BW_5.repositories.StatoFatturaRepository;
 import team6.BW_5.requestDTO.FatturaDTO;
-import team6.BW_5.responseDTO.FatturaCreatedDTO;
 
 import java.time.LocalDate;
 
+@Service
 public class FatturaService {
     //ATTRIBUTI
     private final FatturaRepository fatturaRepository;
@@ -29,7 +31,8 @@ public class FatturaService {
     //METODI
 
     //SALVA FATTURA
-    public FatturaCreatedDTO saveFattura(FatturaDTO payload) {
+    @Transactional
+    public Fattura saveFattura(FatturaDTO payload) {
         //1. trovo il cliente
         Cliente cliente = clienteRepository.findById(payload.idCliente()).orElseThrow(() -> new NotFoundException("il cliente con id " + payload.idCliente() + " non è stato trovato"));
 
@@ -55,8 +58,7 @@ public class FatturaService {
 
         nuovaFattura.setNumero(ultimoNumero + 1);
 
-        Fattura fatturaSalvata = fatturaRepository.save(nuovaFattura);
-        return new FatturaCreatedDTO(fatturaSalvata.getId());
+        return fatturaRepository.save(nuovaFattura);
     }
 
 }

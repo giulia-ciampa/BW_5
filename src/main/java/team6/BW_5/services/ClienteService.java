@@ -37,6 +37,6 @@ public class ClienteService {
             throw new RecordAlreadyExistsException("Il cliente con partita IVA " + body.partitaIva() + " esiste già.");
         if (clienteRepository.existsByPec(body.pec()))
             throw new RecordAlreadyExistsException("Il cliente con PEC " + body.pec() + " esiste già.");
-        return clienteRepository.save(new Cliente(body.ragioneSociale(), body.partitaIva(), body.email(), body.fatturatoAttuale(), body.pec(), body.telefono(), body.emailContatto(), body.nomeContatto(), body.cognomeContatto(), body.telefonoContatto(), body.tipo(), utente));
+        return clienteRepository.save(new Cliente(body.ragioneSociale(), body.partitaIva(), body.email(), body.fatturatoAnnuale(), body.pec(), body.telefono(), body.emailContatto(), body.nomeContatto(), body.cognomeContatto(), body.telefonoContatto(), body.tipo(), utente));
     }
 }
