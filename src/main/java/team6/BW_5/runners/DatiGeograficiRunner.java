@@ -23,7 +23,8 @@ public class DatiGeograficiRunner implements CommandLineRunner {
             Map.entry("Monza e della Brianza", "Monza-Brianza"),
             Map.entry("Bolzano/Bozen", "Bolzano"),
             Map.entry("Reggio nell'Emilia", "Reggio-Emilia"),
-            Map.entry("Valle d'Aosta/Vallée d'Aoste", "Aosta")
+            Map.entry("Valle d'Aosta/Vallée d'Aoste", "Aosta"),
+            Map.entry("Forlì-Cesena", "Forli-Cesena")
     );
     public final ComuneService comuneService;
     public final ProvinciaService provinciaService;
@@ -33,7 +34,6 @@ public class DatiGeograficiRunner implements CommandLineRunner {
         this.provinciaService = provinciaService;
     }
 
-    // toglie trattini e spazi doppi, mette tutto minuscolo, per confrontare nomi scritti in modo leggermente diverso
     private static String normalizza(String s) {
         return s.replace("-", " ").replaceAll("\\s+", " ").trim().toLowerCase();
     }
@@ -81,8 +81,15 @@ public class DatiGeograficiRunner implements CommandLineRunner {
                 if (riga.isBlank()) continue;
                 String[] campi = riga.split(";");
 
-                int codiceProvincia = Integer.parseInt(campi[0].trim());
-                int progressivoComune = Integer.parseInt(campi[1].trim());
+                int codiceProvincia;
+                int progressivoComune;
+                try {
+                    codiceProvincia = Integer.parseInt(campi[0].trim());
+                    progressivoComune = Integer.parseInt(campi[1].trim());
+                } catch (NumberFormatException e) {
+                    System.out.println("Riga scartata, dati numerici non validi: " + riga);
+                    continue;
+                }
                 String denominazioneComune = campi[2].trim();
                 String nomeProvinciaGrezzo = campi[3].trim();
 
