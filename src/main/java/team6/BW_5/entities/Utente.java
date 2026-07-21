@@ -77,8 +77,4 @@ public class Utente implements UserDetails {
                 .toList();
     }
 
-    @Override
-    public String getUsername() {
-        return email;
-    }
 }
