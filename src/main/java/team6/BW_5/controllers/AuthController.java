@@ -45,7 +45,7 @@ public class AuthController {
                 utenteRequestDTO.nome(),
                 utenteRequestDTO.cognome()
         );
-        Utente utenteRegistrato = utenteService.utenteSalvato(nuovoUtente);
+        Utente utenteRegistrato = utenteService.salvaUtente(nuovoUtente);
         return new UtenteResponseDTO(
                 utenteRegistrato.getId(),
                 utenteRegistrato.getUsername(),
