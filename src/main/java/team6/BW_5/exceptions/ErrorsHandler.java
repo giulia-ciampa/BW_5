@@ -52,5 +52,11 @@ public class ErrorsHandler {
         );
     }
 
+    @ExceptionHandler(RuntimeException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ErrorsDTO handleRuntimeException(RuntimeException e) {
+        return new ErrorsDTO(e.getMessage(), LocalDateTime.now());
+    }
+
 
 }
