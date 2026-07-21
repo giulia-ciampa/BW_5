@@ -38,6 +38,11 @@ public class ClienteController {
         return clienteService.findById(clienteId);
     }
 
+    @GetMapping("/me")
+    public Page<Cliente> findOwnClienti(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size, @RequestParam(defaultValue = "dataInserimento") String sortBy, @RequestParam(defaultValue = "DESC") Sort.Direction direction, @AuthenticationPrincipal Utente utente) {
+        return clienteService.findOwnClienti(page, size, sortBy, direction, utente);
+    }
+
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ClienteCreatedDTO createCliente(@RequestBody @Validated ClienteDTO body, BindingResult validationResult, @AuthenticationPrincipal Utente utente) {
@@ -49,4 +54,6 @@ public class ClienteController {
         Cliente saved = clienteService.createCliente(body, utente);
         return new ClienteCreatedDTO(saved.getId());
     }
+
+
 }

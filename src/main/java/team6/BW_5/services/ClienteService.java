@@ -55,4 +55,12 @@ public class ClienteService {
     public Cliente findById(UUID clienteId) {
         return clienteRepository.findById(clienteId).orElseThrow(() -> new NotFoundException("Cliente con id '" + clienteId + "' non trovato"));
     }
+
+    public Page<Cliente> findOwnClienti(int page, int size, String sortBy, Sort.Direction direction, Utente utente) {
+        if (size <= 0) size = 10;
+        if (size > 20) size = 20;
+        if (page < 0) page = 0;
+        Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortBy));
+        return clienteRepository.findByUtente(utente, pageable);
+    }
 }
