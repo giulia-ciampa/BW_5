@@ -3,6 +3,7 @@ package team6.BW_5.services;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import team6.BW_5.entities.RuoloUtente;
 import team6.BW_5.entities.Utente;
 import team6.BW_5.exceptions.NotFoundException;
 import team6.BW_5.repositories.UtenteRepository;
@@ -65,5 +66,5 @@ public class UtenteService {
         utenteRepository.delete(utenteDaEliminare);
     }
 
+    }
 
-}
