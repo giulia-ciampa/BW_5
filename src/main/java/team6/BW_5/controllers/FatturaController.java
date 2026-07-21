@@ -1,6 +1,8 @@
 package team6.BW_5.controllers;
 
 import org.springframework.context.support.DefaultMessageSourceResolvable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
@@ -23,6 +25,7 @@ public class FatturaController {
         this.fatturaService = fatturaService;
     }
 
+    //SALVA FATTURA
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public FatturaCreatedDTO saveFattura(@RequestBody @Validated FatturaDTO payload,
@@ -34,5 +37,16 @@ public class FatturaController {
         }
         Fattura fatturaSalvata = fatturaService.saveFattura(payload);
         return new FatturaCreatedDTO(fatturaSalvata.getId());
+    }
+
+    //VISUALIZZA TUTTE LE FATTURE
+    @GetMapping
+    public Page<Fattura> getAllFatture(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "data") String sortBy,
+            @RequestParam(defaultValue = "DESC") Sort.Direction direction
+    ) {
+        return fatturaService.findAll(page, size, sortBy, direction);
     }
 }

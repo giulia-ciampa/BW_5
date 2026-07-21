@@ -30,7 +30,7 @@ public class AuthController {
 
     //REGISTRAZIONE UTENTE
     @PostMapping("/registrazione")
-    public UtenteResponseDTO registrazione(@RequestBody @Validated UtenteRequestDTO utenteRequestDTO, BindingResult validationResult) {
+    public UtenteResponseDTO registrazione(@RequestBody @Validated UtenteRequestDTO body, BindingResult validationResult) {
 
         if (validationResult.hasErrors()) {
             List<String> errorsList = validationResult.getFieldErrors().stream().map(fieldError -> fieldError.getDefaultMessage()).toList();
@@ -38,14 +38,7 @@ public class AuthController {
         }
 
 
-        Utente nuovoUtente = new Utente(
-                utenteRequestDTO.username(),
-                utenteRequestDTO.email(),
-                utenteRequestDTO.password(),
-                utenteRequestDTO.nome(),
-                utenteRequestDTO.cognome()
-        );
-        Utente utenteRegistrato = utenteService.utenteSalvato(nuovoUtente);
+        Utente utenteRegistrato = utenteService.salvaUtente(body);
         return new UtenteResponseDTO(
                 utenteRegistrato.getId(),
                 utenteRegistrato.getUsername(),

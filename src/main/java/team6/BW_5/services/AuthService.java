@@ -26,7 +26,7 @@ public class AuthService {
         Utente utenteTrovato = utenteService.findByEmail(payload.email());
 
         //password
-        if (!this.bcrypt.matches(payload.password(), utenteTrovato.getPassword())) {
+        if (this.bcrypt.matches(payload.password(), utenteTrovato.getPassword())) {
             return this.jwtTools.generateToken(utenteTrovato);
         } else {
             throw new UnauthorizedException("credenziali sbagliate");
