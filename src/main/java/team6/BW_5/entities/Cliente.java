@@ -54,6 +54,7 @@ public class Cliente {
     @ManyToOne
     @JoinColumn(name = "sede_legale", nullable = false)
     private Indirizzo sedeLegale;
+    @ManyToOne
     @JoinColumn(name = "sede_operativa", nullable = false)
     private Indirizzo sedeOperativa;
 
