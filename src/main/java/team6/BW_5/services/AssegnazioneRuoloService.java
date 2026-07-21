@@ -1,15 +1,11 @@
 package team6.BW_5.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import team6.BW_5.entities.AssegnazioneRuolo;
 import team6.BW_5.entities.RuoloUtente;
 import team6.BW_5.entities.Utente;
 import team6.BW_5.repositories.AssegnazioneRuoloRepository;
-import team6.BW_5.repositories.RuoloUtenteRepository;
-
 import java.time.LocalDate;
 import java.util.List;
 
