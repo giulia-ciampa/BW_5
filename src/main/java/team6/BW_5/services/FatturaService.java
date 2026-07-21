@@ -1,6 +1,10 @@
 package team6.BW_5.services;
 
 import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import team6.BW_5.entities.Cliente;
 import team6.BW_5.entities.Fattura;
@@ -59,6 +63,15 @@ public class FatturaService {
         nuovaFattura.setNumero(ultimoNumero + 1);
 
         return fatturaRepository.save(nuovaFattura);
+    }
+
+    //FIND ALL
+    public Page<Fattura> findAll(int page, int size, String sortBy, Sort.Direction direction) {
+        if (size <= 0) size = 10;
+        if (size > 20) size = 20;
+        if (page < 0) page = 0;
+        Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortBy));
+        return fatturaRepository.findAll(pageable);
     }
 
 }
