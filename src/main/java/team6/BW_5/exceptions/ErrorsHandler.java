@@ -42,5 +42,11 @@ public class ErrorsHandler {
         return new ErrorsDTO("Al momento il server non risponde", LocalDateTime.now());
     }
 
+    @ExceptionHandler(RuntimeException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ErrorsDTO handleRuntimeException(RuntimeException e) {
+        return new ErrorsDTO(e.getMessage(), LocalDateTime.now());
+    }
+
 
 }

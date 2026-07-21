@@ -15,6 +15,8 @@ import team6.BW_5.requestDTO.ClienteDTO;
 import team6.BW_5.responseDTO.ClienteCreatedDTO;
 import team6.BW_5.services.ClienteService;
 
+import java.util.UUID;
+
 @RestController
 @RequestMapping("/clienti")
 public class ClienteController {
@@ -28,6 +30,12 @@ public class ClienteController {
     @GetMapping
     public Page<Cliente> findAll(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size, @RequestParam(defaultValue = "dataInserimento") String sortBy, @RequestParam(defaultValue = "DESC") Sort.Direction direction) {
         return clienteService.findAll(page, size, sortBy, direction);
+    }
+
+
+    @GetMapping("/{clienteId}")
+    public Cliente findById(@PathVariable UUID clienteId) {
+        return clienteService.findById(clienteId);
     }
 
     @PostMapping

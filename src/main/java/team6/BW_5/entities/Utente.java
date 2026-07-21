@@ -76,5 +76,6 @@ public class Utente implements UserDetails {
                 .map(SimpleGrantedAuthority::new)
                 .toList();
     }
+    
 
 }
