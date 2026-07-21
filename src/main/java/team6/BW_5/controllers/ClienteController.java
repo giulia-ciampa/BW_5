@@ -52,8 +52,15 @@ public class ClienteController {
         System.out.println(">>> UTENTE AUTENTICATO RICEVUTO: " + utente);
         System.out.println(">>> DTO RICEVUTO: ");
         Cliente saved = clienteService.createCliente(body, utente);
-        return new ClienteCreatedDTO(saved.getId());
+        return new ClienteCreatedDTO(saved.getIdCliente());
     }
 
+    @PutMapping("/{clienteId}")
+    public Cliente updateCliente(@RequestBody @Validated ClienteDTO body, BindingResult validationResult, @AuthenticationPrincipal Utente utente, @PathVariable UUID clienteId) {
+        if (validationResult.hasErrors()) {
+            throw new ValidationException(validationResult.getFieldErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage).toList());
+        }
+        return clienteService.updateCliente(body, utente, clienteId);
+    }
 
 }

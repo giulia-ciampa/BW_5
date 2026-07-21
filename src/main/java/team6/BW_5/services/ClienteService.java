@@ -10,6 +10,7 @@ import team6.BW_5.entities.Indirizzo;
 import team6.BW_5.entities.Utente;
 import team6.BW_5.exceptions.NotFoundException;
 import team6.BW_5.exceptions.RecordAlreadyExistsException;
+import team6.BW_5.exceptions.UnauthorizedException;
 import team6.BW_5.repositories.ClienteRepository;
 import team6.BW_5.requestDTO.ClienteDTO;
 
@@ -20,10 +21,23 @@ public class ClienteService {
 
     private final ClienteRepository clienteRepository;
     private final IndirizzoService indirizzoService;
+    private final ComuneService comuneService;
 
-    public ClienteService(ClienteRepository clienteRepository, IndirizzoService indirizzoService) {
+    public ClienteService(ClienteRepository clienteRepository, IndirizzoService indirizzoService, ComuneService comuneService) {
         this.clienteRepository = clienteRepository;
         this.indirizzoService = indirizzoService;
+        this.comuneService = comuneService;
+    }
+
+    public void verifyClienteConditions(ClienteDTO body) {
+        if (clienteRepository.existsByEmail(body.email()))
+            throw new RecordAlreadyExistsException("Il cliente con email " + body.email() + " esiste già.");
+        if (clienteRepository.existsByRagioneSociale(body.ragioneSociale()))
+            throw new RecordAlreadyExistsException("Il cliente con ragione sociale " + body.ragioneSociale() + " esiste già.");
+        if (clienteRepository.existsByPartitaIva(body.partitaIva()))
+            throw new RecordAlreadyExistsException("Il cliente con partita IVA " + body.partitaIva() + " esiste già.");
+        if (clienteRepository.existsByPec(body.pec()))
+            throw new RecordAlreadyExistsException("Il cliente con PEC " + body.pec() + " esiste già.");
     }
 
     public Page<Cliente> findAll(int page, int size, String sortBy, Sort.Direction direction) {
@@ -35,15 +49,7 @@ public class ClienteService {
     }
 
     public Cliente createCliente(ClienteDTO body, Utente utente) {
-        if (clienteRepository.existsByEmail(body.email()))
-            throw new RecordAlreadyExistsException("Il cliente con email " + body.email() + " esiste già.");
-        if (clienteRepository.existsByPartitaIva(body.ragioneSociale()))
-            throw new RecordAlreadyExistsException("Il cliente con ragione sociale " + body.ragioneSociale() + " esiste già.");
-        if (clienteRepository.existsByPartitaIva(body.partitaIva()))
-            throw new RecordAlreadyExistsException("Il cliente con partita IVA " + body.partitaIva() + " esiste già.");
-        if (clienteRepository.existsByPec(body.pec()))
-            throw new RecordAlreadyExistsException("Il cliente con PEC " + body.pec() + " esiste già.");
-
+        verifyClienteConditions(body);
 
         Indirizzo sedeLegale = indirizzoService.findByViaCivicoLocalitaOptionalAndComune(body.viaSedeLegale(), body.civicoSedeLegale(), body.localitaSedeLegale(), body.capSedeLegale(), body.denominazioneComuneSedeLegale(), body.siglaProvinciaSedeLegale());
 
@@ -62,5 +68,69 @@ public class ClienteService {
         if (page < 0) page = 0;
         Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortBy));
         return clienteRepository.findByUtente(utente, pageable);
+    }
+
+    public Cliente findByEmail(String email) {
+        return clienteRepository.findByEmail(email).orElseThrow(() -> new NotFoundException("Il cliente con email '" + email + "' non è stato trovato."));
+    }
+
+    public Cliente updateCliente(ClienteDTO body, Utente utente, UUID clienteId) {
+
+        Cliente cliente = findById(clienteId);
+
+        if (!utente.getUtenteId().equals(cliente.getUtente().getUtenteId()))
+            throw new UnauthorizedException("Non possiedi l'autorizzazione per modificare questo cliente.");
+
+
+        Indirizzo sedeLegale;
+        Indirizzo sedeOperativa;
+
+        if (cliente.getSedeLegale().getCap().equals(body.capSedeLegale()) && cliente.getSedeLegale().getVia().equals(body.viaSedeLegale()) && cliente.getSedeLegale().getCivico().equals(body.civicoSedeLegale()) && cliente.getSedeLegale().getComune().equals(comuneService.findByDenominazioneAndProvincia(body.denominazioneComuneSedeLegale(), body.siglaProvinciaSedeLegale())) && cliente.getSedeLegale().getLocalita().equals(body.localitaSedeLegale())) {
+            sedeLegale = cliente.getSedeLegale();
+        } else
+            sedeLegale = indirizzoService.findByViaCivicoLocalitaOptionalAndComune(body.viaSedeLegale(), body.civicoSedeLegale(), body.localitaSedeLegale(), body.capSedeLegale(), body.denominazioneComuneSedeLegale(), body.siglaProvinciaSedeLegale());
+
+        if (cliente.getSedeOperativa().getCap().equals(body.capSedeOperativa()) && cliente.getSedeOperativa().getVia().equals(body.viaSedeOperativa()) && cliente.getSedeOperativa().getCivico().equals(body.civicoSedeOperativa()) && cliente.getSedeOperativa().getComune().equals(comuneService.findByDenominazioneAndProvincia(body.denominazioneComuneSedeOperativa(), body.siglaProvinciaSedeOperativa())) && cliente.getSedeOperativa().getLocalita().equals(body.localitaSedeOperativa())) {
+            sedeOperativa = cliente.getSedeOperativa();
+        } else
+            sedeOperativa = indirizzoService.findByViaCivicoLocalitaOptionalAndComune(body.viaSedeOperativa(), body.civicoSedeOperativa(), body.localitaSedeOperativa(), body.capSedeOperativa(), body.denominazioneComuneSedeOperativa(), body.siglaProvinciaSedeOperativa());
+
+
+        if (!cliente.getRagioneSociale().equals(body.ragioneSociale())) {
+            if (clienteRepository.existsByRagioneSociale(body.ragioneSociale()))
+                throw new RecordAlreadyExistsException("Il cliente con ragione sociale " + body.ragioneSociale() + " esiste già.");
+            cliente.setRagioneSociale(body.ragioneSociale());
+        }
+        if (!cliente.getPartitaIva().equals(body.partitaIva())) {
+            if (clienteRepository.existsByPartitaIva(body.partitaIva()))
+                throw new RecordAlreadyExistsException("Il cliente con partita IVA " + body.partitaIva() + " esiste già.");
+            cliente.setPartitaIva(body.partitaIva());
+        }
+        if (!cliente.getEmail().equals(body.email())) {
+            if (clienteRepository.existsByEmail(body.email()))
+                throw new RecordAlreadyExistsException("Il cliente con email " + body.email() + " esiste già.");
+            cliente.setEmail(body.email());
+        }
+        if (!cliente.getPec().equals(body.pec())) {
+            if (clienteRepository.existsByPec(body.pec()))
+                throw new RecordAlreadyExistsException("Il cliente con PEC " + body.pec() + " esiste già.");
+            cliente.setPec(body.pec());
+        }
+        if (cliente.getFatturatoAnnuale() != body.fatturatoAnnuale())
+            cliente.setFatturatoAnnuale(body.fatturatoAnnuale());
+        if (!cliente.getTelefono().equals(body.telefono())) cliente.setTelefono(body.telefono());
+        if (!cliente.getEmailContatto().equals(body.emailContatto())) cliente.setEmailContatto(body.emailContatto());
+        if (!cliente.getNomeContatto().equals(body.nomeContatto())) cliente.setNomeContatto(body.nomeContatto());
+        if (!cliente.getCognomeContatto().equals(body.cognomeContatto()))
+            cliente.setCognomeContatto(body.cognomeContatto());
+        if (!cliente.getTelefonoContatto().equals(body.telefonoContatto()))
+            cliente.setTelefonoContatto(body.telefonoContatto());
+        if (!cliente.getTipo().equals(body.tipo())) cliente.setTipo(body.tipo());
+        if (!cliente.getSedeLegale().equals(sedeLegale)) cliente.setSedeLegale(sedeLegale);
+        if (!cliente.getSedeOperativa().equals(sedeOperativa)) cliente.setSedeOperativa(sedeOperativa);
+
+
+        return clienteRepository.save(cliente);
+
     }
 }

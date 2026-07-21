@@ -16,7 +16,7 @@ public class StatoFattura {
     @Id
     @GeneratedValue
     @Setter(AccessLevel.NONE)
-    private UUID id;
+    private UUID statoFatturaId;
 
     @Column(nullable = false)
     private String stato;
