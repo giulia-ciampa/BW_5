@@ -1,4 +1,5 @@
 package team6.BW_5.controllers;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -14,6 +15,7 @@ import java.util.UUID;
 @RequestMapping("/utenti")
 public class UtenteController {
     private final UtenteService utenteService;
+
     public UtenteController(UtenteService utenteService) {
         this.utenteService = utenteService;
     }
@@ -21,10 +23,10 @@ public class UtenteController {
     //get per leggere la lista degli utenti impaginata
 
     @GetMapping
-   public Page<UtenteRequestDTO> findAll(Pageable pageable) {
-       Page<Utente> listaUtenti = utenteService.findAll(pageable);
+    public Page<UtenteRequestDTO> findAll(Pageable pageable) {
+        Page<Utente> listaUtenti = utenteService.findAll(pageable);
 
-       //ritorno lista utenti con i requisiti
+        //ritorno lista utenti con i requisiti
         return listaUtenti.map(utente -> new UtenteRequestDTO(
                 utente.getUsername(),
                 utente.getEmail(),
@@ -50,37 +52,18 @@ public class UtenteController {
         );
     }
 
-    //endpoint per registrazione nuovo utente
-    @PostMapping("/registrazione")
-    public UtenteResponseDTO registrazione(@RequestBody UtenteRequestDTO utenteRequestDTO) {
-        Utente nuovoUtente= new Utente(
-                utenteRequestDTO.username(),
-                utenteRequestDTO.email(),
-                utenteRequestDTO.password(),
-                utenteRequestDTO.nome(),
-                utenteRequestDTO.cognome()
-        );
-        Utente utenteRegistrato= utenteService.utenteSalvato(nuovoUtente);
-return new UtenteResponseDTO(
-        utenteRegistrato.getId(),
-        utenteRegistrato.getUsername(),
-        utenteRegistrato.getEmail(),
-        utenteRegistrato.getNome(),
-        utenteRegistrato.getCognome()
-);
-    }
 
     //patch per aggiornare un utente esistente nel db tramite id
     @PutMapping("{id}")
     public UtenteResponseDTO update(@PathVariable UUID id, @RequestBody UtenteRequestDTO utenteRequestDTO) {
-        Utente utenteAggiornato= new Utente(
+        Utente utenteAggiornato = new Utente(
                 utenteRequestDTO.username(),
                 utenteRequestDTO.email(),
                 utenteRequestDTO.password(),
                 utenteRequestDTO.nome(),
                 utenteRequestDTO.cognome()
         );
-        Utente utenteModificato= utenteService.utenteAggiornato(id,utenteAggiornato);
+        Utente utenteModificato = utenteService.utenteAggiornato(id, utenteAggiornato);
         return new UtenteResponseDTO(
                 utenteModificato.getId(),
                 utenteModificato.getUsername(),
@@ -89,6 +72,7 @@ return new UtenteResponseDTO(
                 utenteModificato.getCognome()
         );
     }
+
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable UUID id) {
