@@ -43,7 +43,7 @@ public class UtenteController {
     public UtenteResponseDTO findById(@PathVariable UUID id) {
         Utente utente = utenteService.findById(id);
         return new UtenteResponseDTO(
-                utente.getId(),
+                utente.getUtenteId(),
                 utente.getUsername(),
                 utente.getEmail(),
                 utente.getNome(),
@@ -65,7 +65,7 @@ public class UtenteController {
         );
         Utente utenteModificato = utenteService.utenteAggiornato(id, utenteAggiornato);
         return new UtenteResponseDTO(
-                utenteModificato.getId(),
+                utenteModificato.getUtenteId(),
                 utenteModificato.getUsername(),
                 utenteModificato.getEmail(),
                 utenteModificato.getNome(),

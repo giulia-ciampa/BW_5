@@ -39,7 +39,7 @@ public class FatturaController {
             throw new ValidationException(validationResult.getFieldErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage).toList());
         }
         Fattura fatturaSalvata = fatturaService.saveFattura(payload);
-        return new FatturaCreatedDTO(fatturaSalvata.getId());
+        return new FatturaCreatedDTO(fatturaSalvata.getFatturaId());
     }
 
     //VISUALIZZA TUTTE LE FATTURE

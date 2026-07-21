@@ -16,7 +16,7 @@ public class Indirizzo {
     @GeneratedValue
     @Setter(AccessLevel.NONE)
     @Column(name = "indirizzo_id")
-    private UUID id;
+    private UUID indirizzoId;
     @Column(nullable = false)
     private String via;
     @Column(nullable = false)

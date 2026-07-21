@@ -2,7 +2,10 @@ package team6.BW_5.entities;
 
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 import java.time.LocalDate;
 import java.util.UUID;
@@ -16,7 +19,7 @@ import java.util.UUID;
 public class AssegnazioneRuolo {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private UUID id;
+    private UUID assegnazioneId;
 
     @ManyToOne
     @JoinColumn(name = "id_utente")

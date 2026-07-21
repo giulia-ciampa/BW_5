@@ -17,7 +17,7 @@ public class Cliente {
     @GeneratedValue
     @Setter(AccessLevel.NONE)
     @Column(name = "cliente_id")
-    private UUID id;
+    private UUID idCliente;
     @Column(name = "ragione_sociale", nullable = false, unique = true)
     private String ragioneSociale;
     @Column(name = "partita_iva", nullable = false, unique = true)

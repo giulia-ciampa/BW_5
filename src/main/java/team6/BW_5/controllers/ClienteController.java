@@ -38,6 +38,11 @@ public class ClienteController {
         return clienteService.findById(clienteId);
     }
 
+    @GetMapping("/me")
+    public Page<Cliente> findOwnClienti(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size, @RequestParam(defaultValue = "dataInserimento") String sortBy, @RequestParam(defaultValue = "DESC") Sort.Direction direction, @AuthenticationPrincipal Utente utente) {
+        return clienteService.findOwnClienti(page, size, sortBy, direction, utente);
+    }
+
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ClienteCreatedDTO createCliente(@RequestBody @Validated ClienteDTO body, BindingResult validationResult, @AuthenticationPrincipal Utente utente) {
@@ -47,6 +52,21 @@ public class ClienteController {
         System.out.println(">>> UTENTE AUTENTICATO RICEVUTO: " + utente);
         System.out.println(">>> DTO RICEVUTO: ");
         Cliente saved = clienteService.createCliente(body, utente);
-        return new ClienteCreatedDTO(saved.getId());
+        return new ClienteCreatedDTO(saved.getIdCliente());
     }
+
+    @PutMapping("/{clienteId}")
+    public Cliente updateCliente(@RequestBody @Validated ClienteDTO body, BindingResult validationResult, @AuthenticationPrincipal Utente utente, @PathVariable UUID clienteId) {
+        if (validationResult.hasErrors()) {
+            throw new ValidationException(validationResult.getFieldErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage).toList());
+        }
+        return clienteService.updateCliente(body, utente, clienteId);
+    }
+
+    @DeleteMapping("/me/{clienteId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteOwnCliente(@AuthenticationPrincipal Utente utenteAutenticato, @PathVariable UUID clienteId) {
+        clienteService.deleteOwnCliente(utenteAutenticato, clienteId);
+    }
+
 }

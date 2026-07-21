@@ -17,7 +17,7 @@ import java.util.UUID;
 public class RuoloUtente {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private UUID id;
+    private UUID ruoloId;
 
     @Column(name = "ruolo")
     private String nomeRuolo; //admin o user

@@ -16,7 +16,7 @@ public class Provincia {
     @GeneratedValue
     @Setter(AccessLevel.NONE)
     @Column(name = "provincia_id")
-    private UUID id;
+    private UUID provinciaId;
     @Column(nullable = false, unique = true)
     private String sigla;
     @Column(nullable = false, unique = true)

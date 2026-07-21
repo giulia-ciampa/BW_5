@@ -19,7 +19,7 @@ public class Comune {
     @GeneratedValue
     @Setter(AccessLevel.NONE)
     @Column(name = "comune_id")
-    private UUID id;
+    private UUID comuneId;
     @Column(name = "codice_provincia", nullable = false)
     private int codiceProvincia;
     @Column(name = "progressivo_comune", nullable = false)

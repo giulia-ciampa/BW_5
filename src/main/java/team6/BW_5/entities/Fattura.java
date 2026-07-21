@@ -19,7 +19,7 @@ public class Fattura {
     @Setter(AccessLevel.NONE)
     @Id
     @GeneratedValue
-    private UUID id;
+    private UUID fatturaId;
 
     @Column(nullable = false)
     private LocalDate data;
@@ -27,7 +27,7 @@ public class Fattura {
     @Column(nullable = false)
     private double importo;
 
-    
+
     @Column(nullable = false)
     private long numero;
 

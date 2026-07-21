@@ -40,7 +40,7 @@ public class AuthController {
 
         Utente utenteRegistrato = utenteService.salvaUtente(body);
         return new UtenteResponseDTO(
-                utenteRegistrato.getId(),
+                utenteRegistrato.getUtenteId(),
                 utenteRegistrato.getUsername(),
                 utenteRegistrato.getEmail(),
                 utenteRegistrato.getNome(),
