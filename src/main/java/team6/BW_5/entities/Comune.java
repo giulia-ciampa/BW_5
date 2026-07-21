@@ -27,7 +27,7 @@ public class Comune {
     @Column(nullable = false)
     private String denominazione;
 
-    public Comune(int codiceProvincia, int progressivoComune, int denominazione, Provincia provincia) {
+    public Comune(int codiceProvincia, int progressivoComune, String denominazione, Provincia provincia) {
         this.codiceProvincia = codiceProvincia;
         this.progressivoComune = progressivoComune;
         this.denominazione = denominazione;
