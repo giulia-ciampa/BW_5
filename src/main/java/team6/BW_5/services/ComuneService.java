@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 import team6.BW_5.entities.Comune;
 import team6.BW_5.entities.Provincia;
 import team6.BW_5.exceptions.NotFoundException;
+import team6.BW_5.exceptions.RecordAlreadyExistsException;
 import team6.BW_5.repositories.ComuneRepository;
 
 @Service
@@ -15,6 +16,16 @@ public class ComuneService {
     public ComuneService(ComuneRepository comuneRepository, ProvinciaService provinciaService) {
         this.comuneRepository = comuneRepository;
         this.provinciaService = provinciaService;
+    }
+
+    public Comune save(Comune comune) {
+        if (comuneRepository.existsByDenominazioneAndProvincia(comune.getDenominazione(), comune.getProvincia()))
+            throw new RecordAlreadyExistsException("Il comune denominato " + comune.getDenominazione() + " esiste già nella provincia " + comune.getProvincia().getNome());
+        return comuneRepository.save(comune);
+    }
+
+    public long count() {
+        return comuneRepository.count();
     }
 
     public Comune findByDenominazioneAndProvincia(String denominazione, String siglaProvincia) {

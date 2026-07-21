@@ -11,4 +11,6 @@ import java.util.UUID;
 @Repository
 public interface ComuneRepository extends JpaRepository<Comune, UUID> {
     Optional<Comune> findByDenominazioneAndProvincia(String denominazione, Provincia provincia);
+
+    boolean existsByDenominazioneAndProvincia(String denominazione, Provincia provincia);
 }
