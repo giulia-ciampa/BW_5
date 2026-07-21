@@ -20,4 +20,7 @@ public interface AssegnazioneRuoloRepository extends JpaRepository<AssegnazioneR
 
     // trova se esiste già un'assegnazione attiva   per un utente e un ruolo specifico
     Optional<AssegnazioneRuolo> findByUtenteAndRuoloAndDataRevocaIsNull(Utente utente, RuoloUtente ruolo);
+
+    //  tutte le assegnazioni attive per un determinato utente (senza data di revoca)
+    List<AssegnazioneRuolo> findByUtenteAndDataRevocaIsNull(Utente utente);
 }
