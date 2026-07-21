@@ -39,7 +39,7 @@ public record ClienteDTO(
         @NotNull(message = "Il campo provincia sede legale deve essere compilato")
         String siglaProvinciaSedeLegale,
         @NotNull(message = "Il campo comune sede legale deve essere compilato")
-        String comuneSedeLegale,
+        String denominazioneComuneSedeLegale,
         @NotBlank(message = "Il campo via sede legale deve essere compilato")
         @Size(min = 3, message = "Il campo via sede legale deve essere lungo almeno 3 caratteri.")
         String viaSedeLegale,
@@ -53,7 +53,7 @@ public record ClienteDTO(
         @NotNull(message = "Il campo provincia sede operativa deve essere compilato")
         String siglaProvinciaSedeOperativa,
         @NotNull(message = "Il campo comune sede operativa deve essere compilato")
-        String comuneSedeOperativa,
+        String denominazioneComuneSedeOperativa,
         @NotBlank(message = "Il campo via sede operativa deve essere compilato")
         @Size(min = 3, message = "Il campo via sede operativa deve essere lungo almeno 3 caratteri.")
         String viaSedeOperativa,

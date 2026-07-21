@@ -9,14 +9,17 @@ import team6.BW_5.repositories.IndirizzoRepository;
 public class IndirizzoService {
 
     private final IndirizzoRepository indirizzoRepository;
+    private final ComuneService comuneService;
 
 
-    public IndirizzoService(IndirizzoRepository indirizzoRepository) {
+    public IndirizzoService(IndirizzoRepository indirizzoRepository, ComuneService comuneService) {
         this.indirizzoRepository = indirizzoRepository;
+        this.comuneService = comuneService;
     }
 
 
-    public Indirizzo findByViaCivicoLocalitaOptionalAndComune(String via, String civico, String localita, String cap, Comune comune) {
+    public Indirizzo findByViaCivicoLocalitaOptionalAndComune(String via, String civico, String localita, String cap, String denominazioneComune, String siglaProvinciaSedeLegale) {
+        Comune comune = comuneService.findByDenominazioneAndProvincia(denominazioneComune, siglaProvinciaSedeLegale);
         return indirizzoRepository.findByViaCivicoLocalitaOptionalAndComune(via, civico, localita, cap, comune).orElseGet(() -> indirizzoRepository.save(new Indirizzo(via, civico, localita, cap, comune)));
     }
 }
