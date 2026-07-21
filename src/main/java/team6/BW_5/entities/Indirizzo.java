@@ -21,14 +21,14 @@ public class Indirizzo {
     private String via;
     @Column(nullable = false)
     private String civico;
-    @Column(nullable = false)
     private String localita;
     @Column(nullable = false)
-    private int cap;
-    @Column(nullable = false)
-    private String comune;
+    private String cap;
+    @ManyToOne
+    @JoinColumn(nullable = false)
+    private Comune comune;
 
-    public Indirizzo(String via, String civico, String localita, int cap, String comune) {
+    public Indirizzo(String via, String civico, String localita, String cap, Comune comune) {
         this.via = via;
         this.civico = civico;
         this.localita = localita;

@@ -35,6 +35,34 @@ public record ClienteDTO(
         @Size(min = 9, message = "Il campo telefono contatto deve essere lungo almeno 9 caratteri.")
         String telefonoContatto,
         @NotNull(message = "Il campo email di contatto deve essere compilato.")
-        TipoAzienda tipo
+        TipoAzienda tipo,
+        @NotNull(message = "Il campo provincia sede legale deve essere compilato")
+        String siglaProvinciaSedeLegale,
+        @NotNull(message = "Il campo comune sede legale deve essere compilato")
+        String denominazioneComuneSedeLegale,
+        @NotBlank(message = "Il campo via sede legale deve essere compilato")
+        @Size(min = 3, message = "Il campo via sede legale deve essere lungo almeno 3 caratteri.")
+        String viaSedeLegale,
+        @NotBlank(message = "Il campo civico sede legale deve essere compilato")
+        @Size(min = 1, message = "Il campo civico sede legale deve essere lungo almeno 1 carattere.")
+        String civicoSedeLegale,
+        String localitaSedeLegale,
+        @NotBlank(message = "Il campo CAP sede legale deve essere compilato")
+        @Size(min = 4, message = "Il campo CAP sede legale deve essere lungo almeno 4 caratteri.")
+        String capSedeLegale,
+        @NotNull(message = "Il campo provincia sede operativa deve essere compilato")
+        String siglaProvinciaSedeOperativa,
+        @NotNull(message = "Il campo comune sede operativa deve essere compilato")
+        String denominazioneComuneSedeOperativa,
+        @NotBlank(message = "Il campo via sede operativa deve essere compilato")
+        @Size(min = 3, message = "Il campo via sede operativa deve essere lungo almeno 3 caratteri.")
+        String viaSedeOperativa,
+        @NotBlank(message = "Il campo civico sede operativa deve essere compilato")
+        @Size(min = 1, message = "Il campo civico sede operativa deve essere lungo almeno 1 carattere.")
+        String civicoSedeOperativa,
+        String localitaSedeOperativa,
+        @NotBlank(message = "Il campo CAP sede operativa deve essere compilato")
+        @Size(min = 4, message = "Il campo CAP sede operativa deve essere lungo almeno 4 caratteri.")
+        String capSedeOperativa
 ) {
 }
