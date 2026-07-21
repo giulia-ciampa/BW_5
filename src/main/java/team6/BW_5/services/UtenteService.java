@@ -3,6 +3,7 @@ package team6.BW_5.services;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import team6.BW_5.entities.RuoloUtente;
 import team6.BW_5.entities.Utente;
 import team6.BW_5.exceptions.NotFoundException;
 import team6.BW_5.repositories.UtenteRepository;
@@ -65,12 +66,13 @@ public class UtenteService {
                 "con id" + " " + id));
         utenteRepository.delete(utenteDaEliminare);
     }
-
+    
     //findByEmail
     public Utente findByEmail(String email) {
         Utente utenteTrovato = utenteRepository.findByEmail(email).orElseThrow(() -> new NotFoundException("l'utente con l'email " + email + " non è stato trovato"));
         return utenteTrovato;
     }
+    
+    }
 
 
-}
