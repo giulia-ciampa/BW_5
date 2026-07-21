@@ -13,6 +13,9 @@ import java.util.UUID;
 @Service
 public class UtenteService {
     private UtenteRepository utenteRepository;
+    public  UtenteService(UtenteRepository utenteRepository) {
+        this.utenteRepository = utenteRepository;
+    }
 
     //metodo per tornare lista di utenti con paginazione inclusa da usare nel getmapping del controller
     public Page<Utente> findAll(Pageable pageable) {
