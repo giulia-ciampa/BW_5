@@ -38,14 +38,7 @@ public class AuthController {
         }
 
 
-        Utente nuovoUtente = new Utente(
-                body.username(),
-                body.email(),
-                body.password(),
-                body.nome(),
-                body.cognome()
-        );
-        Utente utenteRegistrato = utenteService.salvaUtente(nuovoUtente);
+        Utente utenteRegistrato = utenteService.salvaUtente(body);
         return new UtenteResponseDTO(
                 utenteRegistrato.getId(),
                 utenteRegistrato.getUsername(),
