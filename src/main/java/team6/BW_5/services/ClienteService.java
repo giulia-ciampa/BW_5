@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import team6.BW_5.entities.Cliente;
+import team6.BW_5.entities.Indirizzo;
 import team6.BW_5.entities.Utente;
 import team6.BW_5.exceptions.RecordAlreadyExistsException;
 import team6.BW_5.repositories.ClienteRepository;
@@ -15,9 +16,11 @@ import team6.BW_5.requestDTO.ClienteDTO;
 public class ClienteService {
 
     private final ClienteRepository clienteRepository;
+    private final IndirizzoService indirizzoService;
 
-    public ClienteService(ClienteRepository clienteRepository) {
+    public ClienteService(ClienteRepository clienteRepository, IndirizzoService indirizzoService) {
         this.clienteRepository = clienteRepository;
+        this.indirizzoService = indirizzoService;
     }
 
     public Page<Cliente> findAll(int page, int size, String sortBy, Sort.Direction direction) {
@@ -37,6 +40,12 @@ public class ClienteService {
             throw new RecordAlreadyExistsException("Il cliente con partita IVA " + body.partitaIva() + " esiste già.");
         if (clienteRepository.existsByPec(body.pec()))
             throw new RecordAlreadyExistsException("Il cliente con PEC " + body.pec() + " esiste già.");
-        return clienteRepository.save(new Cliente(body.ragioneSociale(), body.partitaIva(), body.email(), body.fatturatoAnnuale(), body.pec(), body.telefono(), body.emailContatto(), body.nomeContatto(), body.cognomeContatto(), body.telefonoContatto(), body.tipo(), utente));
+
+
+        Indirizzo sedeLegale = indirizzoService.findByViaCivicoLocalitaOptionalAndComune(body.viaSedeLegale(), body.civicoSedeLegale(), body.localitaSedeLegale(), body.capSedeLegale(), body.denominazioneComuneSedeLegale(), body.siglaProvinciaSedeLegale());
+
+        Indirizzo sedeOperativa = indirizzoService.findByViaCivicoLocalitaOptionalAndComune(body.viaSedeOperativa(), body.civicoSedeOperativa(), body.localitaSedeOperativa(), body.capSedeOperativa(), body.denominazioneComuneSedeOperativa(), body.siglaProvinciaSedeOperativa());
+
+        return clienteRepository.save(new Cliente(body.ragioneSociale(), body.partitaIva(), body.email(), body.fatturatoAnnuale(), body.pec(), body.telefono(), body.emailContatto(), body.nomeContatto(), body.cognomeContatto(), body.telefonoContatto(), body.tipo(), utente, sedeLegale, sedeOperativa));
     }
 }
