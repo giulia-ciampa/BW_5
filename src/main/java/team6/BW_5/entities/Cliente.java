@@ -48,9 +48,8 @@ public class Cliente {
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private TipoAzienda tipo;
-    @Column(nullable = false)
     @ManyToOne
-    @JoinColumn(name = "creato_da")
+    @JoinColumn(name = "creato_da", nullable = false)
     private Utente utente;
 
     public Cliente(String ragioneSociale, String partitaIva, String email, double fatturatoAnnuale, String pec, String telefono, String emailContatto, String nomeContatto, String cognomeContatto, String telefonoContatto, TipoAzienda tipo, Utente utente) {
