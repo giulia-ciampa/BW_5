@@ -12,6 +12,7 @@ import team6.BW_5.entities.Fattura;
 import team6.BW_5.entities.Utente;
 import team6.BW_5.exceptions.ValidationException;
 import team6.BW_5.requestDTO.FatturaDTO;
+import team6.BW_5.requestDTO.FatturaPatchDTO;
 import team6.BW_5.responseDTO.FatturaCreatedDTO;
 import team6.BW_5.services.FatturaService;
 
@@ -71,5 +72,19 @@ public class FatturaController {
         }
 
         return fatturaService.updateFattura(idFattura, body);
+    }
+
+
+    //UPDATE FATTURA PATCH
+    @PatchMapping("/{idFattura}")
+    public Fattura patchFattura(@PathVariable UUID idFattura,
+                                @RequestBody @Validated FatturaPatchDTO payload,
+                                BindingResult validationResult) {
+        if (validationResult.hasErrors()) {
+            throw new ValidationException(validationResult.getFieldErrors().stream()
+                    .map(DefaultMessageSourceResolvable::getDefaultMessage).toList());
+        }
+
+        return fatturaService.patchFattura(idFattura, payload);
     }
 }

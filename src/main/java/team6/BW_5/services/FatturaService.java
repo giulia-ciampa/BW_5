@@ -14,6 +14,7 @@ import team6.BW_5.repositories.ClienteRepository;
 import team6.BW_5.repositories.FatturaRepository;
 import team6.BW_5.repositories.StatoFatturaRepository;
 import team6.BW_5.requestDTO.FatturaDTO;
+import team6.BW_5.requestDTO.FatturaPatchDTO;
 
 import java.time.LocalDate;
 import java.util.UUID;
@@ -83,7 +84,7 @@ public class FatturaService {
         return fatturaTrovata;
     }
 
-    //UPDATE
+    //UPDATE -> POST
     public Fattura updateFattura(UUID id, FatturaDTO payload) {
         Fattura fatturaTrovata = findById(id);
 
@@ -97,5 +98,27 @@ public class FatturaService {
 
     }
 
+    //UPDATE -> PATCH
+    public Fattura patchFattura(UUID id, FatturaPatchDTO payload) {
+        Fattura fatturaTrovata = findById(id);
+        if (payload.data() != null) {
+            fatturaTrovata.setData(payload.data());
+        }
+
+
+        if (payload.importo() != null) {
+            fatturaTrovata.setImporto(payload.importo());
+        }
+
+        if (payload.idCliente() != null) {
+
+            Cliente clienteTrovato = clienteRepository.findById(payload.idCliente()).orElseThrow(() -> new NotFoundException("il cliente con id " + payload.idCliente() + " non è stato trovato"));
+            fatturaTrovata.setCliente(clienteTrovato);
+        }
+
+        return fatturaRepository.save(fatturaTrovata);
+    }
 
 }
+
+

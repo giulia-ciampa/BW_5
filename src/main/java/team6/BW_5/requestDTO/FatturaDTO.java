@@ -16,7 +16,7 @@ public record FatturaDTO(
 
         @NotNull(message = "l'importo è obbligatorio")
         @Positive(message = "L'importo della fattura deve essere maggiore di zero")
-        double importo,
+        Double importo,
 
         @NotNull(message = "L'ID del cliente è obbligatorio")
         UUID idCliente) {
