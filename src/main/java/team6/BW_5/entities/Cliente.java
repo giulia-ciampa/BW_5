@@ -51,8 +51,14 @@ public class Cliente {
     @ManyToOne
     @JoinColumn(name = "creato_da", nullable = false)
     private Utente utente;
+    @ManyToOne
+    @JoinColumn(name = "sede_legale", nullable = false)
+    private Indirizzo sedeLegale;
+    @JoinColumn(name = "sede_operativa", nullable = false)
+    private Indirizzo sedeOperativa;
 
-    public Cliente(String ragioneSociale, String partitaIva, String email, double fatturatoAnnuale, String pec, String telefono, String emailContatto, String nomeContatto, String cognomeContatto, String telefonoContatto, TipoAzienda tipo, Utente utente) {
+
+    public Cliente(String ragioneSociale, String partitaIva, String email, double fatturatoAnnuale, String pec, String telefono, String emailContatto, String nomeContatto, String cognomeContatto, String telefonoContatto, TipoAzienda tipo, Utente utente, Indirizzo sedeLegale, Indirizzo sedeOperativa) {
         this.ragioneSociale = ragioneSociale;
         this.partitaIva = partitaIva;
         this.email = email;
@@ -68,5 +74,7 @@ public class Cliente {
         this.dataInserimento = LocalDate.now();
         this.dataUltimoContatto = LocalDate.now();
         this.logoAziendale = "https://ui-avatars.com/api/?name=" + ragioneSociale;
+        this.sedeLegale = sedeLegale;
+        this.sedeOperativa = sedeOperativa;
     }
 }
