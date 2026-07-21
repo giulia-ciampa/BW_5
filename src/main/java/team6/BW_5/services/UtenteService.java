@@ -28,7 +28,7 @@ public class UtenteService {
 
     // findById
     public Utente findById(UUID id) {
-        return utenteRepository.findById(id).orElseThrow(() -> new RuntimeException("L'utente con id" + " " + id + " non è stato trovato"));
+        return utenteRepository.findById(id).orElseThrow(() -> new NotFoundException("L'utente con id" + " " + id + " non è stato trovato"));
     }
 
     // salvo utente, ma prima controllo se email e username inseriti non siano gia nel db

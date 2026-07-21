@@ -8,9 +8,12 @@ import org.springframework.stereotype.Service;
 import team6.BW_5.entities.Cliente;
 import team6.BW_5.entities.Indirizzo;
 import team6.BW_5.entities.Utente;
+import team6.BW_5.exceptions.NotFoundException;
 import team6.BW_5.exceptions.RecordAlreadyExistsException;
 import team6.BW_5.repositories.ClienteRepository;
 import team6.BW_5.requestDTO.ClienteDTO;
+
+import java.util.UUID;
 
 @Service
 public class ClienteService {
@@ -47,5 +50,9 @@ public class ClienteService {
         Indirizzo sedeOperativa = indirizzoService.findByViaCivicoLocalitaOptionalAndComune(body.viaSedeOperativa(), body.civicoSedeOperativa(), body.localitaSedeOperativa(), body.capSedeOperativa(), body.denominazioneComuneSedeOperativa(), body.siglaProvinciaSedeOperativa());
 
         return clienteRepository.save(new Cliente(body.ragioneSociale(), body.partitaIva(), body.email(), body.fatturatoAnnuale(), body.pec(), body.telefono(), body.emailContatto(), body.nomeContatto(), body.cognomeContatto(), body.telefonoContatto(), body.tipo(), utente, sedeLegale, sedeOperativa));
+    }
+
+    public Cliente findById(UUID clienteId) {
+        return clienteRepository.findById(clienteId).orElseThrow(() -> new NotFoundException("Cliente con id '" + clienteId + "' non trovato"));
     }
 }
