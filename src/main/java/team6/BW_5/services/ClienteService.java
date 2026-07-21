@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import team6.BW_5.entities.Cliente;
+import team6.BW_5.entities.Utente;
 import team6.BW_5.exceptions.RecordAlreadyExistsException;
 import team6.BW_5.repositories.ClienteRepository;
 import team6.BW_5.requestDTO.ClienteDTO;
