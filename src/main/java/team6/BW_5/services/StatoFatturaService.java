@@ -1,8 +1,11 @@
 package team6.BW_5.services;
 
+import org.springframework.stereotype.Service;
 import team6.BW_5.entities.StatoFattura;
 import team6.BW_5.repositories.StatoFatturaRepository;
 
+
+@Service
 public class StatoFatturaService {
 
     private final StatoFatturaRepository statoFatturaRepository;
@@ -11,11 +14,12 @@ public class StatoFatturaService {
         this.statoFatturaRepository = statoFatturaRepository;
     }
 
-    public StatoFattura trovaOAlimentaStato(String stato) {
-        return statoFatturaRepository.findByStato(stato).orElseGet(() -> {
-            StatoFattura nuovoStato = new StatoFattura();
-            nuovoStato.setStato(stato);
-            return statoFatturaRepository.save(nuovoStato);
-        });
+    public StatoFattura salvaEmissioneFattura() {
+        return statoFatturaRepository.findByStato("EMESSA")
+                .orElseGet(() -> {
+                    StatoFattura nuovoStato = new StatoFattura();
+                    nuovoStato.setStato("EMESSA");
+                    return statoFatturaRepository.save(nuovoStato);
+                });
     }
 }
