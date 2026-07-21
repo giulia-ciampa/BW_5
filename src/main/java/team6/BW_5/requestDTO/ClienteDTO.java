@@ -15,7 +15,7 @@ public record ClienteDTO(
         String email,
         @PositiveOrZero(message = "Il campo fatturato annuale deve essere maggiore o uguale a zero.")
         @NotNull(message = "Il campo fatturato annuale deve essere compilato.")
-        double fatturatoAttuale,
+        double fatturatoAnnuale,
         @NotBlank(message = "Il campo pec deve essere compilato.")
         @Email(message = "Il campo pec deve essere una pec valida")
         String pec,
