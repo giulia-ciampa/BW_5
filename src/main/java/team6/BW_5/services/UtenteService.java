@@ -4,6 +4,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import team6.BW_5.entities.Utente;
+import team6.BW_5.exceptions.NotFoundException;
 import team6.BW_5.repositories.UtenteRepository;
 
 import java.util.List;
@@ -12,6 +13,9 @@ import java.util.UUID;
 @Service
 public class UtenteService {
     private UtenteRepository utenteRepository;
+    public  UtenteService(UtenteRepository utenteRepository) {
+        this.utenteRepository = utenteRepository;
+    }
 
     //metodo per tornare lista di utenti con paginazione inclusa da usare nel getmapping del controller
     public Page<Utente> findAll(Pageable pageable) {
@@ -53,6 +57,12 @@ public class UtenteService {
         utenteEsistente.setPassword(utenteModificato.getPassword());
 
         return utenteRepository.save(utenteEsistente);
+    }
+    //delete per utente tramite id
+  public void eliminaUtente(UUID id) {
+        Utente utenteDaEliminare = utenteRepository.findById(id).orElseThrow(()->new NotFoundException("Utente non trovato" +
+                "con id" + " " + id));
+        utenteRepository.delete(utenteDaEliminare);
     }
 
 
