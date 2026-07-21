@@ -27,7 +27,7 @@ public class Fattura {
     @Column(nullable = false)
     private double importo;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private long numero;
 
     @ManyToOne
@@ -40,12 +40,12 @@ public class Fattura {
 
     //COSTRUTTORE
 
-    public Fattura(LocalDate data, double importo, long numero, StatoFattura stato, Cliente cliente) {
+    public Fattura(LocalDate data, double importo, StatoFattura stato, Cliente cliente) {
         this.data = data;
         this.importo = importo;
-        this.numero = numero;
         this.stato = stato;
         this.cliente = cliente;
+        this.numero = 0;
     }
 
 
