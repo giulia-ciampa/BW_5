@@ -54,7 +54,7 @@ public class Utente implements UserDetails {
 
     @OneToMany(
             mappedBy = "utente",
-            fetch = FetchType.LAZY
+            fetch = FetchType.EAGER
     )
     private List<AssegnazioneRuolo> assegnazioniRuolo = new ArrayList<>();
 
@@ -76,6 +76,6 @@ public class Utente implements UserDetails {
                 .map(SimpleGrantedAuthority::new)
                 .toList();
     }
-    
+
 
 }
