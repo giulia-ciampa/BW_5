@@ -16,6 +16,7 @@ import team6.BW_5.repositories.StatoFatturaRepository;
 import team6.BW_5.requestDTO.FatturaDTO;
 
 import java.time.LocalDate;
+import java.util.UUID;
 
 @Service
 public class FatturaService {
@@ -74,4 +75,12 @@ public class FatturaService {
         return fatturaRepository.findAll(pageable);
     }
 
+    //FINDBYID
+
+    public Fattura findById(UUID id) {
+        Fattura fatturaTrovata = fatturaRepository.findById(id).orElseThrow(() -> new NotFoundException("la fattura con id " + id + " non è stata trovata"));
+        return fatturaTrovata;
+    }
+
+    
 }

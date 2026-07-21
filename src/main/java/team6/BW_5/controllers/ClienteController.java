@@ -40,10 +40,12 @@ public class ClienteController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ClienteCreatedDTO createCliente(@RequestBody @Validated ClienteDTO body, @AuthenticationPrincipal Utente utente, BindingResult validationResult) {
+    public ClienteCreatedDTO createCliente(@RequestBody @Validated ClienteDTO body, BindingResult validationResult, @AuthenticationPrincipal Utente utente) {
         if (validationResult.hasErrors()) {
             throw new ValidationException(validationResult.getFieldErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage).toList());
         }
+        System.out.println(">>> UTENTE AUTENTICATO RICEVUTO: " + utente);
+        System.out.println(">>> DTO RICEVUTO: ");
         Cliente saved = clienteService.createCliente(body, utente);
         return new ClienteCreatedDTO(saved.getId());
     }

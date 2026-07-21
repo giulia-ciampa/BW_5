@@ -15,6 +15,8 @@ import team6.BW_5.requestDTO.FatturaDTO;
 import team6.BW_5.responseDTO.FatturaCreatedDTO;
 import team6.BW_5.services.FatturaService;
 
+import java.util.UUID;
+
 @RestController
 @RequestMapping("/fatture")
 public class FatturaController {
@@ -48,5 +50,12 @@ public class FatturaController {
             @RequestParam(defaultValue = "DESC") Sort.Direction direction
     ) {
         return fatturaService.findAll(page, size, sortBy, direction);
+    }
+
+    //TROVA LA FATTURA PER ID
+    @GetMapping("/{idFattura}")
+    public Fattura findById(@PathVariable UUID idFattura) {
+        Fattura fatturaTrovata = fatturaService.findById(idFattura);
+        return fatturaTrovata;
     }
 }
