@@ -34,7 +34,7 @@ public class FatturaService {
         Cliente cliente = clienteRepository.findById(payload.idCliente()).orElseThrow(() -> new NotFoundException("il cliente con id " + payload.idCliente() + " non è stato trovato"));
 
         //2. stato iniziale
-        StatoFattura statoIniziale = statoFatturaService.trovaOAlimentaStato("EMESSA");
+        StatoFattura statoIniziale = statoFatturaService.salvaEmissioneFattura();
 
         //3. nuova fattura usando il costruttore
         Fattura nuovaFattura = new Fattura(payload.data(), payload.importo(), statoIniziale, cliente);
@@ -45,10 +45,10 @@ public class FatturaService {
         int anno = payload.data().getYear();
 
         // oggetto che indica il primo giorno dell'anno
-        LocalDate inizioAnno = LocalDate.of(2026, 1, 1);
+        LocalDate inizioAnno = LocalDate.of(anno, 1, 1);
 
         //oggetto che indica l'ultimo giorno dell'anno
-        LocalDate fineAnno = LocalDate.of(2026, 12, 31);
+        LocalDate fineAnno = LocalDate.of(anno, 12, 31);
 
         //query
         long ultimoNumero = fatturaRepository.findFirstByDataBetweenOrderByNumeroDesc(inizioAnno, fineAnno).map(fattura -> fattura.getNumero()).orElse(0L);
