@@ -88,6 +88,8 @@ public class DatiGeograficiRunner implements CommandLineRunner {
                     progressivoComune = Integer.parseInt(campi[1].trim());
                 } catch (NumberFormatException e) {
                     System.out.println("Riga scartata, dati numerici non validi: " + riga);
+                    codiceProvincia = 0;
+                    progressivoComune = 0;
                     continue;
                 }
                 String denominazioneComune = campi[2].trim();

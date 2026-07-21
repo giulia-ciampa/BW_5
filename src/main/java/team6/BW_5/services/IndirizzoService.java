@@ -18,8 +18,26 @@ public class IndirizzoService {
     }
 
 
-    public Indirizzo findByViaCivicoLocalitaOptionalAndComune(String via, String civico, String localita, String cap, String denominazioneComune, String siglaProvinciaSedeLegale) {
-        Comune comune = comuneService.findByDenominazioneAndProvincia(denominazioneComune, siglaProvinciaSedeLegale);
-        return indirizzoRepository.findByViaCivicoLocalitaOptionalAndComune(via, civico, localita, cap, comune).orElseGet(() -> indirizzoRepository.save(new Indirizzo(via, civico, localita, cap, comune)));
+    public Indirizzo findByViaCivicoLocalitaOptionalAndComune(
+            String via,
+            String civico,
+            String localita,
+            String cap,
+            String denominazioneComune,
+            String siglaProvincia
+
+    ) {
+        Comune comune = comuneService.findByDenominazioneAndProvincia(denominazioneComune, siglaProvincia);
+        if (localita == null) {
+            return indirizzoRepository
+                    .findByViaIgnoreCaseAndCivicoIgnoreCaseAndCapIgnoreCaseAndComune(
+                            via, civico, cap, comune
+                    ).orElseGet(() -> indirizzoRepository.save(new Indirizzo(via, civico, null, cap, comune)));
+        }
+
+        return indirizzoRepository
+                .findByViaIgnoreCaseAndCivicoIgnoreCaseAndLocalitaIgnoreCaseAndCapIgnoreCaseAndComune(
+                        via, civico, localita, cap, comune
+                ).orElseGet(() -> indirizzoRepository.save(new Indirizzo(via, civico, localita, cap, comune)));
     }
 }
