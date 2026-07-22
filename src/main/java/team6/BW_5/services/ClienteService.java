@@ -27,12 +27,14 @@ public class ClienteService {
     private final ClienteRepository clienteRepository;
     private final IndirizzoService indirizzoService;
     private final ComuneService comuneService;
+    private final ClienteSpecifications clienteSpecifications;
 
 
-    public ClienteService(ClienteRepository clienteRepository, IndirizzoService indirizzoService, ComuneService comuneService) {
+    public ClienteService(ClienteRepository clienteRepository, IndirizzoService indirizzoService, ComuneService comuneService, ClienteSpecifications clienteSpecifications) {
         this.clienteRepository = clienteRepository;
         this.indirizzoService = indirizzoService;
         this.comuneService = comuneService;
+        this.clienteSpecifications = clienteSpecifications;
     }
 
     public void verifyClienteConditions(ClienteDTO body) {
@@ -46,28 +48,17 @@ public class ClienteService {
             throw new RecordAlreadyExistsException("Il cliente con PEC " + body.pec() + " esiste già.");
     }
 
-    public Page<Cliente> findAll(int page, int size, String sortBy, Sort.Direction direction, String ragioneSociale, Double fatturatoMassimo, Double fatturatoMinimo, LocalDate dataInserimentoMax, LocalDate dataUltimoContattoMax) {
+    public Page<Cliente> findAll(int page, int size, String sortBy, Sort.Direction direction, String ragioneSociale, Double fatturatoMassimo, Double fatturatoMinimo, LocalDate dataInserimentoMax, LocalDate dataInserimentoMin, LocalDate dataUltimoContattoMax, LocalDate dataUltimoContattoMin) {
         if (size <= 0) size = 10;
         if (size > 20) size = 20;
         if (page < 0) page = 0;
         Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortBy));
-        Specification<Cliente> spec = Specification.where((Specification<Cliente>) null);
-        if (ragioneSociale != null && !ragioneSociale.isBlank()) {
-            spec = spec.and(ClienteSpecifications.hasRagioneSociale(ragioneSociale));
-        }
 
-        if (fatturatoMassimo != null && !fatturatoMassimo.isNaN()) {
-            spec = spec.and(ClienteSpecifications.fatturatoLessThanOrEqualTo(fatturatoMassimo));
-        }
+        Specification<Cliente> spec = clienteSpecifications.specificationClienteBuilder(ragioneSociale, fatturatoMassimo, fatturatoMinimo, dataInserimentoMax, dataInserimentoMin, dataUltimoContattoMax, dataUltimoContattoMin);
 
-        if (fatturatoMinimo != null && !fatturatoMinimo.isNaN()) {
-            spec = spec.and(ClienteSpecifications.fatturatoGreaterThanOrEqualTo(fatturatoMinimo));
+        if (spec == null) {
+            return clienteRepository.findAll(pageable);
         }
-
-        if (dataInserimentoMax != null) {
-            spec = spec.and(ClienteSpecifications.dataInserimentoBeforeThan(dataInserimentoMax));
-        }
-
 
         return clienteRepository.findAll(spec, pageable);
     }
