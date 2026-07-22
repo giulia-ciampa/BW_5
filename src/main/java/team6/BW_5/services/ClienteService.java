@@ -4,6 +4,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import team6.BW_5.entities.Cliente;
 import team6.BW_5.entities.Indirizzo;
@@ -15,7 +16,9 @@ import team6.BW_5.repositories.ClienteRepository;
 import team6.BW_5.requestDTO.ClienteDTO;
 import team6.BW_5.requestDTO.PatchAttivazioneClienteDTO;
 import team6.BW_5.responseDTO.PatchAttivazioneClienteResponseDTO;
+import team6.BW_5.specifications.ClienteSpecifications;
 
+import java.time.LocalDate;
 import java.util.UUID;
 
 @Service
@@ -24,6 +27,7 @@ public class ClienteService {
     private final ClienteRepository clienteRepository;
     private final IndirizzoService indirizzoService;
     private final ComuneService comuneService;
+
 
     public ClienteService(ClienteRepository clienteRepository, IndirizzoService indirizzoService, ComuneService comuneService) {
         this.clienteRepository = clienteRepository;
@@ -42,12 +46,30 @@ public class ClienteService {
             throw new RecordAlreadyExistsException("Il cliente con PEC " + body.pec() + " esiste già.");
     }
 
-    public Page<Cliente> findAll(int page, int size, String sortBy, Sort.Direction direction) {
+    public Page<Cliente> findAll(int page, int size, String sortBy, Sort.Direction direction, String ragioneSociale, Double fatturatoMassimo, Double fatturatoMinimo, LocalDate dataInserimentoMax, LocalDate dataUltimoContattoMax) {
         if (size <= 0) size = 10;
         if (size > 20) size = 20;
         if (page < 0) page = 0;
         Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortBy));
-        return clienteRepository.findAll(pageable);
+        Specification<Cliente> spec = Specification.where((Specification<Cliente>) null);
+        if (ragioneSociale != null && !ragioneSociale.isBlank()) {
+            spec = spec.and(ClienteSpecifications.hasRagioneSociale(ragioneSociale));
+        }
+
+        if (fatturatoMassimo != null && !fatturatoMassimo.isNaN()) {
+            spec = spec.and(ClienteSpecifications.fatturatoLessThanOrEqualTo(fatturatoMassimo));
+        }
+
+        if (fatturatoMinimo != null && !fatturatoMinimo.isNaN()) {
+            spec = spec.and(ClienteSpecifications.fatturatoGreaterThanOrEqualTo(fatturatoMinimo));
+        }
+
+        if (dataInserimentoMax != null) {
+            spec = spec.and(ClienteSpecifications.dataInserimentoBeforeThan(dataInserimentoMax));
+        }
+
+
+        return clienteRepository.findAll(spec, pageable);
     }
 
     public Cliente createCliente(ClienteDTO body, Utente utente) {

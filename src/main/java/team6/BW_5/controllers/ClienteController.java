@@ -17,6 +17,7 @@ import team6.BW_5.responseDTO.ClienteCreatedDTO;
 import team6.BW_5.responseDTO.PatchAttivazioneClienteResponseDTO;
 import team6.BW_5.services.ClienteService;
 
+import java.time.LocalDate;
 import java.util.UUID;
 
 @RestController
@@ -30,8 +31,8 @@ public class ClienteController {
     }
 
     @GetMapping
-    public Page<Cliente> findAll(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size, @RequestParam(defaultValue = "dataInserimento") String sortBy, @RequestParam(defaultValue = "DESC") Sort.Direction direction) {
-        return clienteService.findAll(page, size, sortBy, direction);
+    public Page<Cliente> findAll(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size, @RequestParam(defaultValue = "dataInserimento") String sortBy, @RequestParam(defaultValue = "DESC") Sort.Direction direction, @RequestParam String ragioneSociale, @RequestParam Double fatturatoMassimo, @RequestParam Double fatturatoMinimo, @RequestParam LocalDate dataInserimentoMax, @RequestParam LocalDate dataUltimoContattoMax) {
+        return clienteService.findAll(page, size, sortBy, direction, ragioneSociale, fatturatoMassimo, fatturatoMinimo, dataInserimentoMax, dataUltimoContattoMax);
     }
 
 
@@ -62,7 +63,7 @@ public class ClienteController {
         if (validationResult.hasErrors()) {
             throw new ValidationException(validationResult.getFieldErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage).toList());
         }
-        
+
         return clienteService.updateCliente(body, utente, clienteId);
     }
 
