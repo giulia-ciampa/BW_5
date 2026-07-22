@@ -21,7 +21,8 @@ import java.util.UUID;
 @NoArgsConstructor
 public class Utente implements UserDetails {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(nullable = false, updatable = false)
     private UUID utenteId;
 
     @Column(nullable = false, unique = true)

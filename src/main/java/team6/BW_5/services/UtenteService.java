@@ -85,6 +85,10 @@ public class UtenteService {
     public Utente aggiornaParzialmenteUtente(UUID id, UtentePatchDTO patchDTO) {
         Utente utenteEsistente = findById(id);
 
+        if (patchDTO.id() != null) {
+            throw new IllegalArgumentException("Non puoi modificare l'ID!");
+        }
+
         if (patchDTO.username() != null) {
             utenteEsistente.setUsername(patchDTO.username());
         }
