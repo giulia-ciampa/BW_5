@@ -49,7 +49,7 @@ public class UtenteController {
     //get per leggere un singolo utente tramite id
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAuthority('ADMIN','USER')")
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('USER')")
     public UtenteResponseDTO findById(@PathVariable UUID id) {
         Utente utente = utenteService.findById(id);
         return new UtenteResponseDTO(

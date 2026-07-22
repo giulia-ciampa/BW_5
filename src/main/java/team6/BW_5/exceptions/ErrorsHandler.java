@@ -103,8 +103,9 @@ public class ErrorsHandler {
     }
 
     @ExceptionHandler(AuthorizationDeniedException.class)
-    @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    public ErrorsDTO AuthorizationDeniedException(AuthorizationDeniedException e) {
-        return new ErrorsDTO(e.getMessage(), LocalDateTime.now());
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public ErrorsDTO handleAuthorizationDeniedException(AuthorizationDeniedException e) {
+        return new ErrorsDTO("Non hai i permessi necessari per eseguire questa operazione.", LocalDateTime.now());
     }
+
 }

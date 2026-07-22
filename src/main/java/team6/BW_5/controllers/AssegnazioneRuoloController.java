@@ -5,10 +5,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import team6.BW_5.entities.AssegnazioneRuolo;
 import team6.BW_5.entities.RuoloUtente;
 import team6.BW_5.entities.Utente;
+import team6.BW_5.exceptions.UnauthorizedException;
 import team6.BW_5.services.AssegnazioneRuoloService;
 import team6.BW_5.services.RuoloUtenteService;
 import team6.BW_5.services.UtenteService;
@@ -31,6 +33,7 @@ public class AssegnazioneRuoloController {
 
     // assegno un ruolo a un utente
     @PostMapping("/utente/{idUtente}/ruolo/{idRuolo}")
+    @PreAuthorize("hasAuthority('ADMIN')")
     @ResponseStatus(HttpStatus.CREATED)
     public AssegnazioneRuolo assegnaRuolo(@PathVariable UUID idUtente, @PathVariable UUID idRuolo) {
         Utente utente = utenteService.findById(idUtente);
@@ -39,6 +42,7 @@ public class AssegnazioneRuoloController {
     }
     // revoca di ruolo tramite id
     @PatchMapping("/utente/{idUtente}/ruolo/{idRuolo}/revoca")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public AssegnazioneRuolo revocaRuolo(@PathVariable UUID idUtente, @PathVariable UUID idRuolo) {
         Utente utente = utenteService.findById(idUtente);
         RuoloUtente ruolo = ruoloUtenteService.ruoloPerId(idRuolo);
@@ -47,7 +51,19 @@ public class AssegnazioneRuoloController {
 
     //storico dei ruoli assegnati ad un utente
     @GetMapping("/utente/{idUtente}/attivi")
-    public List<RuoloUtente> getRuoliAttiviPerUtente(@PathVariable UUID idUtente) {
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('USER')")
+    public List<RuoloUtente> getRuoliAttiviPerUtente(@PathVariable UUID idUtente, @AuthenticationPrincipal Utente utenteLoggato) {
+
+        // se utente è ADMIN oppure sta cercando i propri ruoli
+        boolean isAdmin = utenteLoggato.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ADMIN"));
+
+        boolean isStessoUtente = utenteLoggato.getUtenteId().equals(idUtente);
+
+        if (!isAdmin && !isStessoUtente) {
+            throw new UnauthorizedException("Non puoi visualizzare i ruoli di un altro utente!");
+        }
+
         Utente utente = utenteService.findById(idUtente);
         return assegnazioneRuoloService.trovaRuoliAttiviPerUtente(utente);
     }
