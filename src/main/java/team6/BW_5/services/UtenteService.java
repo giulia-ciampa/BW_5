@@ -26,7 +26,7 @@ public class UtenteService {
         return utenteRepository.findAll(pageable);
     }
 
-    // findById
+    //findById
     public Utente findById(UUID id) {
         return utenteRepository.findById(id).orElseThrow(() -> new NotFoundException("L'utente con id" + " " + id + " non è stato trovato"));
     }

@@ -9,10 +9,9 @@ import org.springframework.stereotype.Service;
 import team6.BW_5.entities.Cliente;
 import team6.BW_5.entities.Fattura;
 import team6.BW_5.entities.StatoFattura;
+import team6.BW_5.exceptions.BadRequestException;
 import team6.BW_5.exceptions.NotFoundException;
-import team6.BW_5.repositories.ClienteRepository;
 import team6.BW_5.repositories.FatturaRepository;
-import team6.BW_5.repositories.StatoFatturaRepository;
 import team6.BW_5.requestDTO.FatturaDTO;
 import team6.BW_5.requestDTO.FatturaPatchDTO;
 
@@ -23,16 +22,14 @@ import java.util.UUID;
 public class FatturaService {
     //ATTRIBUTI
     private final FatturaRepository fatturaRepository;
-    private final ClienteRepository clienteRepository;
-    private final StatoFatturaRepository statoFatturaRepository;
     private final StatoFatturaService statoFatturaService;
+    private final ClienteService clienteService;
 
 
-    public FatturaService(FatturaRepository fatturaRepository, ClienteRepository clienteRepository, StatoFatturaRepository statoFatturaRepository, StatoFatturaService statoFatturaService) {
+    public FatturaService(FatturaRepository fatturaRepository, StatoFatturaService statoFatturaService, ClienteService clienteService) {
         this.fatturaRepository = fatturaRepository;
-        this.clienteRepository = clienteRepository;
-        this.statoFatturaRepository = statoFatturaRepository;
         this.statoFatturaService = statoFatturaService;
+        this.clienteService = clienteService;
     }
 
     //METODI
@@ -41,8 +38,8 @@ public class FatturaService {
     @Transactional
     public Fattura saveFattura(FatturaDTO payload) {
         //1. trovo il cliente
-        Cliente cliente = clienteRepository.findById(payload.idCliente()).orElseThrow(() -> new NotFoundException("il cliente con id " + payload.idCliente() + " non è stato trovato"));
-
+        Cliente cliente = clienteService.findById(payload.idCliente());
+//FAI CONTROLLO SE IL CLIENTE NON E' ATTIVO LANCIA UNAUTHORIZED EXCEPTION
         //2. stato iniziale
         StatoFattura statoIniziale = statoFatturaService.salvaEmissioneFattura();
 
@@ -78,7 +75,6 @@ public class FatturaService {
     }
 
     //FINDBYID
-
     public Fattura findById(UUID id) {
         Fattura fatturaTrovata = fatturaRepository.findById(id).orElseThrow(() -> new NotFoundException("la fattura con id " + id + " non è stata trovata"));
         return fatturaTrovata;
@@ -87,11 +83,11 @@ public class FatturaService {
     //UPDATE -> POST
     public Fattura updateFattura(UUID id, FatturaDTO payload) {
         Fattura fatturaTrovata = findById(id);
-
+//SE FATTURA TROVATA, GET CLIENTE, SE NON E' ACTIVE SPARA ECCEZIONE
         fatturaTrovata.setData(payload.data());
         fatturaTrovata.setImporto(payload.importo());
 
-        Cliente clienteTrovato = clienteRepository.findById(payload.idCliente()).orElseThrow(() -> new NotFoundException("il cliente con id " + payload.idCliente() + " non è stato trovato"));
+        Cliente clienteTrovato = clienteService.findById(payload.idCliente());
         fatturaTrovata.setCliente(clienteTrovato);
 
         return fatturaRepository.save(fatturaTrovata);
@@ -101,6 +97,7 @@ public class FatturaService {
     //UPDATE -> PATCH
     public Fattura patchFattura(UUID id, FatturaPatchDTO payload) {
         Fattura fatturaTrovata = findById(id);
+        //ECCEZIONE CLIENTE NON ATTIVO
         if (payload.data() != null) {
             fatturaTrovata.setData(payload.data());
         }
@@ -112,7 +109,7 @@ public class FatturaService {
 
         if (payload.idCliente() != null) {
 
-            Cliente clienteTrovato = clienteRepository.findById(payload.idCliente()).orElseThrow(() -> new NotFoundException("il cliente con id " + payload.idCliente() + " non è stato trovato"));
+            Cliente clienteTrovato = clienteService.findById(payload.idCliente());
             fatturaTrovata.setCliente(clienteTrovato);
         }
 
@@ -123,6 +120,34 @@ public class FatturaService {
     public void deleteFattura(UUID id) {
         Fattura fatturaTrovata = findById(id);
         fatturaRepository.delete(fatturaTrovata);
+    }
+
+
+    //UPDATE STATO FATTURA
+    public Fattura updateStatoFattura(UUID fatturaId, String nuovoStato) {
+
+        //1. recupero la fattura
+        Fattura fatturaTrovata = findById(fatturaId);
+
+        String statoAttuale = fatturaTrovata.getStato().getStato();
+        String nuovoStatoUpper = nuovoStato.toUpperCase();
+
+        //2. regole di transizione
+        if ("PAGATA".equalsIgnoreCase(statoAttuale) && !"PAGATA".equalsIgnoreCase(nuovoStatoUpper)) {
+            throw new BadRequestException("Una fattura già PAGATA non può cambiare stato!");
+        }
+
+        if ("ANNULLATA".equalsIgnoreCase(statoAttuale)) {
+            throw new BadRequestException("Una fattura ANNULLATA non può più cambiare stato!");
+        }
+
+        // 3. Chiediamo a StatoFatturaService di trovarci o crearci lo stato valido
+        StatoFattura nuovoStatoEntity = statoFatturaService.findByStatoOrCreate(nuovoStatoUpper);
+
+        // 4. Assegniamo e salviAMO
+        fatturaTrovata.setStato(nuovoStatoEntity);
+        return fatturaRepository.save(fatturaTrovata);
+
     }
 
 }
