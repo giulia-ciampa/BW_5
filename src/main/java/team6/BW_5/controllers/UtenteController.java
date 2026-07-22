@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import team6.BW_5.entities.Utente;
 import team6.BW_5.requestDTO.UtenteRequestDTO;
+import team6.BW_5.responseDTO.UtentePatchDTO;
 import team6.BW_5.responseDTO.UtenteResponseDTO;
 import team6.BW_5.services.UtenteService;
 
@@ -65,6 +66,19 @@ public class UtenteController {
                 true
         );
         Utente utenteModificato = utenteService.utenteAggiornato(id, utenteAggiornato);
+        return new UtenteResponseDTO(
+                utenteModificato.getUtenteId(),
+                utenteModificato.getUsername(),
+                utenteModificato.getEmail(),
+                utenteModificato.getNome(),
+                utenteModificato.getCognome()
+        );
+    }
+
+    //aggiornamento parziale dto utente
+    @PatchMapping("{id}")
+    public UtenteResponseDTO updatePartial(@PathVariable UUID id, @RequestBody UtentePatchDTO patchDTO) {
+        Utente utenteModificato = utenteService.aggiornaParzialmenteUtente(id, patchDTO);
         return new UtenteResponseDTO(
                 utenteModificato.getUtenteId(),
                 utenteModificato.getUsername(),

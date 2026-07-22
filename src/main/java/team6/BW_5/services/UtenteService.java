@@ -8,6 +8,7 @@ import team6.BW_5.entities.Utente;
 import team6.BW_5.exceptions.NotFoundException;
 import team6.BW_5.repositories.UtenteRepository;
 import team6.BW_5.requestDTO.UtenteRequestDTO;
+import team6.BW_5.responseDTO.UtentePatchDTO;
 
 import java.util.UUID;
 
@@ -24,6 +25,10 @@ public class UtenteService {
     //metodo per tornare lista di utenti con paginazione inclusa da usare nel getmapping del controller
     public Page<Utente> findAll(Pageable pageable) {
         return utenteRepository.findAll(pageable);
+    }
+    // find all per gli utenti attivi
+    public Page<Utente> findAllAttivi(Pageable pageable) {
+        return utenteRepository.findByIsAttivoTrue(pageable);
     }
 
     // findById
@@ -42,11 +47,6 @@ public class UtenteService {
         return utenteRepository.save(new Utente(body.username(), body.email(), bcrypt.encode(body.password()), body.nome(), body.cognome(), true));
     }
 
-    //metodo per eliminare utente byId
-    public void utenteEliminato(UUID id) {
-        Utente utente = findById(id);
-        utenteRepository.delete(utente);
-    }
 
     //metodo per aggiornare utente
     public Utente utenteAggiornato(UUID id, Utente utenteModificato) {
@@ -63,17 +63,45 @@ public class UtenteService {
         return utenteRepository.save(utenteEsistente);
     }
 
-    //delete per utente tramite id
+    //soft delete
     public void eliminaUtente(UUID id) {
-        Utente utenteDaEliminare = utenteRepository.findById(id).orElseThrow(() -> new NotFoundException("Utente non trovato" +
-                "con id" + " " + id));
-        utenteRepository.delete(utenteDaEliminare);
+        Utente utenteDaEliminare = findById(id); // trovo utente o lancio ecc
+
+        utenteDaEliminare.setAttivo(false);   // se non è attivo "lo spengo" (Soft Delete)
+
+        utenteRepository.save(utenteDaEliminare);
+    }
+//find by email e se e attiva
+    public Utente findByEmail(String email) {
+        return utenteRepository.findByEmailAndIsAttivoTrue(email)
+                .orElseThrow(() -> new NotFoundException("L'utente con l'email " + email + " non è stato trovato o non è attivo"));
+    }
+    public Utente findByUsername(String username) {
+        return utenteRepository.findByUsernameAndIsAttivoTrue(username)
+                .orElseThrow(() -> new NotFoundException("L'utente con username " + username + " non è stato trovato o non è attivo"));
     }
 
-    //findByEmail
-    public Utente findByEmail(String email) {
-        Utente utenteTrovato = utenteRepository.findByEmail(email).orElseThrow(() -> new NotFoundException("l'utente con l'email " + email + " non è stato trovato"));
-        return utenteTrovato;
+    //patch per modificare solo parte dell'utente
+    public Utente aggiornaParzialmenteUtente(UUID id, UtentePatchDTO patchDTO) {
+        Utente utenteEsistente = findById(id);
+
+        if (patchDTO.username() != null) {
+            utenteEsistente.setUsername(patchDTO.username());
+        }
+        if (patchDTO.email() != null) {
+            utenteEsistente.setEmail(patchDTO.email());
+        }
+        if (patchDTO.password() != null) {
+            utenteEsistente.setPassword(bcrypt.encode(patchDTO.password()));
+        }
+        if (patchDTO.nome() != null) {
+            utenteEsistente.setNome(patchDTO.nome());
+        }
+        if (patchDTO.cognome() != null) {
+            utenteEsistente.setCognome(patchDTO.cognome());
+        }
+
+        return utenteRepository.save(utenteEsistente);
     }
 
 }
