@@ -13,7 +13,9 @@ import team6.BW_5.entities.Utente;
 import team6.BW_5.exceptions.ValidationException;
 import team6.BW_5.requestDTO.FatturaDTO;
 import team6.BW_5.requestDTO.FatturaPatchDTO;
+import team6.BW_5.requestDTO.StatoFatturaDTO;
 import team6.BW_5.responseDTO.FatturaCreatedDTO;
+import team6.BW_5.responseDTO.StatoFatturaUpdatedDTO;
 import team6.BW_5.services.FatturaService;
 
 import java.util.UUID;
@@ -94,4 +96,20 @@ public class FatturaController {
     public void deleteFattura(@PathVariable UUID idFattura) {
         fatturaService.deleteFattura(idFattura);
     }
+
+
+    //    //UPDATE STATO FATTURA
+    @PatchMapping("/{idFattura}/stato")
+    public StatoFatturaUpdatedDTO updateStatoFattura(
+            @PathVariable UUID idFattura,
+            @RequestBody @Validated StatoFatturaDTO payload) {
+        Fattura fatturaAggiornata = fatturaService.updateStatoFattura(idFattura, payload.nuovoStato());
+
+        return new StatoFatturaUpdatedDTO(
+                fatturaAggiornata.getFatturaId(),
+                fatturaAggiornata.getStato().getStato(),
+                "Stato fattura aggiornato con successo!"
+        );
+    }
+
 }
