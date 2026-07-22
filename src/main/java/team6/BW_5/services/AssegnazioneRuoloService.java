@@ -13,14 +13,12 @@ import java.util.List;
 @Service
 public class AssegnazioneRuoloService {
 
-    @Autowired
-    private UtenteService utenteService;
-    @Autowired
-    private RuoloUtenteService ruoloUtenteService;
+
+
 
     private final AssegnazioneRuoloRepository assegnazioneRuoloRepository;
 
-    public AssegnazioneRuoloService(AssegnazioneRuoloRepository assegnazioneRuoloRepository) {
+    public AssegnazioneRuoloService( AssegnazioneRuoloRepository assegnazioneRuoloRepository) {
         this.assegnazioneRuoloRepository = assegnazioneRuoloRepository;
     }
 

@@ -16,10 +16,14 @@ import java.util.UUID;
 public class UtenteService {
     private final PasswordEncoder bcrypt;
     private UtenteRepository utenteRepository;
+    private final AssegnazioneRuoloService assegnazioneRuoloService;
+    private final RuoloUtenteService ruoloUtenteService;
 
-    public UtenteService(UtenteRepository utenteRepository, PasswordEncoder bcrypt) {
+    public UtenteService(UtenteRepository utenteRepository, PasswordEncoder bcrypt, AssegnazioneRuoloService assegnazioneRuoloService, RuoloUtenteService ruoloUtenteService) {
         this.utenteRepository = utenteRepository;
         this.bcrypt = bcrypt;
+        this.assegnazioneRuoloService = assegnazioneRuoloService;
+        this.ruoloUtenteService = ruoloUtenteService;
     }
 
     //metodo per tornare lista di utenti con paginazione inclusa da usare nel getmapping del controller
@@ -44,7 +48,10 @@ public class UtenteService {
         if (utenteRepository.existsByUsername(body.username())) {
             throw new RuntimeException("L'username inserito è gia nei nostri database!");
         }
-        return utenteRepository.save(new Utente(body.username(), body.email(), bcrypt.encode(body.password()), body.nome(), body.cognome(), true));
+        Utente nuovoUtente= utenteRepository.save(new Utente(body.username(), body.email(), bcrypt.encode(body.password()), body.nome(), body.cognome(), true));
+        assegnazioneRuoloService.assegnaRuolo(nuovoUtente, ruoloUtenteService.findByNomeRuolo("USER"));
+
+        return nuovoUtente;
     }
 
 
