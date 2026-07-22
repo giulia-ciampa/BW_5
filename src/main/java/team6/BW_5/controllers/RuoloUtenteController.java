@@ -2,6 +2,7 @@ package team6.BW_5.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import team6.BW_5.entities.RuoloUtente;
 import team6.BW_5.services.RuoloUtenteService;

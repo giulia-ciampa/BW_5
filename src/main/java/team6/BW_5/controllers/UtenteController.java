@@ -3,6 +3,7 @@ package team6.BW_5.controllers;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import team6.BW_5.entities.Utente;
 import team6.BW_5.requestDTO.UtenteRequestDTO;
@@ -24,6 +25,7 @@ public class UtenteController {
     //get per leggere la lista degli utenti impaginata
 
     @GetMapping
+    @PreAuthorize("hasAuthority('ADMIN')")
     public Page<UtenteRequestDTO> findAll(Pageable pageable) {
         Page<Utente> listaUtenti = utenteService.findAll(pageable);
 
@@ -41,6 +43,7 @@ public class UtenteController {
     //get per leggere un singolo utente tramite id
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public UtenteResponseDTO findById(@PathVariable UUID id) {
         Utente utente = utenteService.findById(id);
         return new UtenteResponseDTO(
@@ -56,6 +59,7 @@ public class UtenteController {
 
     //patch per aggiornare un utente esistente nel db tramite id
     @PutMapping("{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public UtenteResponseDTO update(@PathVariable UUID id, @RequestBody UtenteRequestDTO utenteRequestDTO) {
         Utente utenteAggiornato = new Utente(
                 utenteRequestDTO.username(),
@@ -77,6 +81,7 @@ public class UtenteController {
 
     //aggiornamento parziale dto utente
     @PatchMapping("{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public UtenteResponseDTO updatePartial(@PathVariable UUID id, @RequestBody UtentePatchDTO patchDTO) {
         Utente utenteModificato = utenteService.aggiornaParzialmenteUtente(id, patchDTO);
         return new UtenteResponseDTO(
@@ -89,6 +94,7 @@ public class UtenteController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable UUID id) {
         utenteService.eliminaUtente(id);
