@@ -53,8 +53,6 @@ public class ClienteController {
         if (validationResult.hasErrors()) {
             throw new ValidationException(validationResult.getFieldErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage).toList());
         }
-        System.out.println(">>> UTENTE AUTENTICATO RICEVUTO: " + utente);
-        System.out.println(">>> DTO RICEVUTO: ");
         Cliente saved = clienteService.createCliente(body, utente);
         return new ClienteCreatedDTO(saved.getIdCliente());
     }
