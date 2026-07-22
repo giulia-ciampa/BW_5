@@ -1,10 +1,12 @@
 package team6.BW_5.exceptions;
 
+import org.springframework.data.core.PropertyReferenceException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import team6.BW_5.responseDTO.ErrorsDTO;
 import team6.BW_5.responseDTO.ErrorsWithListDTO;
 
@@ -28,6 +30,18 @@ public class ErrorsHandler {
     @ExceptionHandler(UnauthorizedException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     public ErrorsDTO handleUnauthorizedException(UnauthorizedException e) {
+        return new ErrorsDTO(e.getMessage(), LocalDateTime.now());
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorsDTO handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException e) {
+        return new ErrorsDTO(e.getMessage(), LocalDateTime.now());
+    }
+
+    @ExceptionHandler(PropertyReferenceException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorsDTO handlePropertyReferenceException(PropertyReferenceException e) {
         return new ErrorsDTO(e.getMessage(), LocalDateTime.now());
     }
 
