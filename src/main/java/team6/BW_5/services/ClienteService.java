@@ -4,6 +4,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import team6.BW_5.entities.Cliente;
 import team6.BW_5.entities.Indirizzo;
@@ -13,8 +14,10 @@ import team6.BW_5.exceptions.RecordAlreadyExistsException;
 import team6.BW_5.exceptions.UnauthorizedException;
 import team6.BW_5.repositories.ClienteRepository;
 import team6.BW_5.requestDTO.ClienteDTO;
+import team6.BW_5.requestDTO.ClienteFilterDTO;
 import team6.BW_5.requestDTO.PatchAttivazioneClienteDTO;
 import team6.BW_5.responseDTO.PatchAttivazioneClienteResponseDTO;
+import team6.BW_5.specifications.ClienteSpecifications;
 
 import java.util.UUID;
 
@@ -24,11 +27,14 @@ public class ClienteService {
     private final ClienteRepository clienteRepository;
     private final IndirizzoService indirizzoService;
     private final ComuneService comuneService;
+    private final ClienteSpecifications clienteSpecifications;
 
-    public ClienteService(ClienteRepository clienteRepository, IndirizzoService indirizzoService, ComuneService comuneService) {
+
+    public ClienteService(ClienteRepository clienteRepository, IndirizzoService indirizzoService, ComuneService comuneService, ClienteSpecifications clienteSpecifications) {
         this.clienteRepository = clienteRepository;
         this.indirizzoService = indirizzoService;
         this.comuneService = comuneService;
+        this.clienteSpecifications = clienteSpecifications;
     }
 
     public void verifyClienteConditions(ClienteDTO body) {
@@ -42,12 +48,19 @@ public class ClienteService {
             throw new RecordAlreadyExistsException("Il cliente con PEC " + body.pec() + " esiste già.");
     }
 
-    public Page<Cliente> findAll(int page, int size, String sortBy, Sort.Direction direction) {
+    public Page<Cliente> findAll(int page, int size, String sortBy, Sort.Direction direction, ClienteFilterDTO filters) {
         if (size <= 0) size = 10;
         if (size > 20) size = 20;
         if (page < 0) page = 0;
         Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortBy));
-        return clienteRepository.findAll(pageable);
+
+        Specification<Cliente> spec = clienteSpecifications.specificationClienteBuilder(filters);
+
+        if (spec == null) {
+            return clienteRepository.findAll(pageable);
+        }
+
+        return clienteRepository.findAll(spec, pageable);
     }
 
     public Cliente createCliente(ClienteDTO body, Utente utente) {
@@ -64,12 +77,17 @@ public class ClienteService {
         return clienteRepository.findById(clienteId).orElseThrow(() -> new NotFoundException("Cliente con id '" + clienteId + "' non trovato"));
     }
 
-    public Page<Cliente> findOwnClienti(int page, int size, String sortBy, Sort.Direction direction, Utente utente) {
+    public Page<Cliente> findOwnClienti(int page, int size, String sortBy, Sort.Direction direction, Utente utente, ClienteFilterDTO filters) {
         if (size <= 0) size = 10;
         if (size > 20) size = 20;
         if (page < 0) page = 0;
+        Specification<Cliente> spec = clienteSpecifications.specificationClienteBuilder(filters);
         Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortBy));
-        return clienteRepository.findByUtente(utente, pageable);
+        if (spec == null) {
+            return clienteRepository.findByUtente(utente, pageable);
+        }
+        spec = spec.and(clienteSpecifications.byUtente(utente));
+        return clienteRepository.findAll(spec, pageable);
     }
 
     public Cliente findByEmail(String email) {

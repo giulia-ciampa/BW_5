@@ -1,5 +1,6 @@
 package team6.BW_5.controllers;
 
+import jakarta.validation.Valid;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
@@ -12,6 +13,7 @@ import team6.BW_5.entities.Cliente;
 import team6.BW_5.entities.Utente;
 import team6.BW_5.exceptions.ValidationException;
 import team6.BW_5.requestDTO.ClienteDTO;
+import team6.BW_5.requestDTO.ClienteFilterDTO;
 import team6.BW_5.requestDTO.PatchAttivazioneClienteDTO;
 import team6.BW_5.responseDTO.ClienteCreatedDTO;
 import team6.BW_5.responseDTO.PatchAttivazioneClienteResponseDTO;
@@ -30,8 +32,8 @@ public class ClienteController {
     }
 
     @GetMapping
-    public Page<Cliente> findAll(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size, @RequestParam(defaultValue = "dataInserimento") String sortBy, @RequestParam(defaultValue = "DESC") Sort.Direction direction) {
-        return clienteService.findAll(page, size, sortBy, direction);
+    public Page<Cliente> findAll(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size, @RequestParam(defaultValue = "dataInserimento") String sortBy, @RequestParam(defaultValue = "DESC") Sort.Direction direction, @Valid @ModelAttribute ClienteFilterDTO filters) {
+        return clienteService.findAll(page, size, sortBy, direction, filters);
     }
 
 
@@ -41,8 +43,8 @@ public class ClienteController {
     }
 
     @GetMapping("/me")
-    public Page<Cliente> findOwnClienti(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size, @RequestParam(defaultValue = "dataInserimento") String sortBy, @RequestParam(defaultValue = "DESC") Sort.Direction direction, @AuthenticationPrincipal Utente utente) {
-        return clienteService.findOwnClienti(page, size, sortBy, direction, utente);
+    public Page<Cliente> findOwnClienti(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size, @RequestParam(defaultValue = "dataInserimento") String sortBy, @RequestParam(defaultValue = "DESC") Sort.Direction direction, @AuthenticationPrincipal Utente utente, @Valid @ModelAttribute ClienteFilterDTO filters) {
+        return clienteService.findOwnClienti(page, size, sortBy, direction, utente, filters);
     }
 
     @PostMapping
@@ -71,7 +73,10 @@ public class ClienteController {
 //    }
 
     @PatchMapping("/attivazione/{clienteId}")
-    public PatchAttivazioneClienteResponseDTO setIsAttivo(@AuthenticationPrincipal Utente utenteAutenticato, @PathVariable UUID clienteId, @RequestBody @Validated PatchAttivazioneClienteDTO body) {
+    public PatchAttivazioneClienteResponseDTO setIsAttivo(@AuthenticationPrincipal Utente utenteAutenticato, @PathVariable UUID clienteId, @RequestBody @Validated PatchAttivazioneClienteDTO body, BindingResult validationResult) {
+        if (validationResult.hasErrors()) {
+            throw new ValidationException(validationResult.getFieldErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage).toList());
+        }
         return clienteService.setIsAttivo(utenteAutenticato, clienteId, body);
     }
 
