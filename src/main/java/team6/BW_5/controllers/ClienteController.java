@@ -31,8 +31,8 @@ public class ClienteController {
     }
 
     @GetMapping
-    public Page<Cliente> findAll(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size, @RequestParam(defaultValue = "dataInserimento") String sortBy, @RequestParam(defaultValue = "DESC") Sort.Direction direction, @RequestParam String ragioneSociale, @RequestParam Double fatturatoMassimo, @RequestParam Double fatturatoMinimo, @RequestParam LocalDate dataInserimentoMax, @RequestParam LocalDate dataUltimoContattoMax) {
-        return clienteService.findAll(page, size, sortBy, direction, ragioneSociale, fatturatoMassimo, fatturatoMinimo, dataInserimentoMax, dataUltimoContattoMax);
+    public Page<Cliente> findAll(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size, @RequestParam(defaultValue = "dataInserimento") String sortBy, @RequestParam(defaultValue = "DESC") Sort.Direction direction, @RequestParam(required = false) String ragioneSociale, @RequestParam(required = false) Double fatturatoMassimo, @RequestParam(required = false) Double fatturatoMinimo, @RequestParam(required = false) LocalDate dataInserimentoMax, @RequestParam(required = false) LocalDate dataInserimentoMin, @RequestParam(required = false) LocalDate dataUltimoContattoMax, @RequestParam(required = false) LocalDate dataUltimoContattoMin) {
+        return clienteService.findAll(page, size, sortBy, direction, ragioneSociale, fatturatoMassimo, fatturatoMinimo, dataInserimentoMax, dataInserimentoMin, dataUltimoContattoMax, dataUltimoContattoMin);
     }
 
 
