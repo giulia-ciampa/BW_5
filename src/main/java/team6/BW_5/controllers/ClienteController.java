@@ -43,8 +43,8 @@ public class ClienteController {
     }
 
     @GetMapping("/me")
-    public Page<Cliente> findOwnClienti(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size, @RequestParam(defaultValue = "dataInserimento") String sortBy, @RequestParam(defaultValue = "DESC") Sort.Direction direction, @AuthenticationPrincipal Utente utente) {
-        return clienteService.findOwnClienti(page, size, sortBy, direction, utente);
+    public Page<Cliente> findOwnClienti(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size, @RequestParam(defaultValue = "dataInserimento") String sortBy, @RequestParam(defaultValue = "DESC") Sort.Direction direction, @AuthenticationPrincipal Utente utente, @Valid @ModelAttribute ClienteFilterDTO filters) {
+        return clienteService.findOwnClienti(page, size, sortBy, direction, utente, filters);
     }
 
     @PostMapping

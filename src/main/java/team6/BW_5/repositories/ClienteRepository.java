@@ -23,5 +23,6 @@ public interface ClienteRepository extends JpaRepository<Cliente, UUID>, JpaSpec
 
     Page<Cliente> findByUtente(Utente utente, Pageable pageable);
 
+
     Optional<Cliente> findByEmail(String email);
 }

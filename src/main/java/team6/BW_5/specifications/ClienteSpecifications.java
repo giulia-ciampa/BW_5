@@ -3,6 +3,7 @@ package team6.BW_5.specifications;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 import team6.BW_5.entities.Cliente;
+import team6.BW_5.entities.Utente;
 import team6.BW_5.requestDTO.ClienteFilterDTO;
 
 import java.time.LocalDate;
@@ -81,6 +82,11 @@ public class ClienteSpecifications {
 
     public Specification<Cliente> dataUltimoContattoAfterThan(LocalDate dataUltimoContattoMin) {
         return (root, query, cb) -> cb.greaterThanOrEqualTo(root.get("dataInserimento"), dataUltimoContattoMin);
+    }
+
+    public Specification<Cliente> byUtente(Utente utente) {
+        return (root, query, cb) ->
+                cb.equal(root.get("utente"), utente);
     }
 
 

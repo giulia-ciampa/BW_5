@@ -77,12 +77,17 @@ public class ClienteService {
         return clienteRepository.findById(clienteId).orElseThrow(() -> new NotFoundException("Cliente con id '" + clienteId + "' non trovato"));
     }
 
-    public Page<Cliente> findOwnClienti(int page, int size, String sortBy, Sort.Direction direction, Utente utente) {
+    public Page<Cliente> findOwnClienti(int page, int size, String sortBy, Sort.Direction direction, Utente utente, ClienteFilterDTO filters) {
         if (size <= 0) size = 10;
         if (size > 20) size = 20;
         if (page < 0) page = 0;
+        Specification<Cliente> spec = clienteSpecifications.specificationClienteBuilder(filters);
         Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortBy));
-        return clienteRepository.findByUtente(utente, pageable);
+        if (spec == null) {
+            return clienteRepository.findByUtente(utente, pageable);
+        }
+        spec = spec.and(clienteSpecifications.byUtente(utente));
+        return clienteRepository.findAll(spec, pageable);
     }
 
     public Cliente findByEmail(String email) {
