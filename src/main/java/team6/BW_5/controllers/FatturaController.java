@@ -1,5 +1,6 @@
 package team6.BW_5.controllers;
 
+import jakarta.validation.Valid;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
@@ -12,6 +13,7 @@ import team6.BW_5.entities.Fattura;
 import team6.BW_5.entities.Utente;
 import team6.BW_5.exceptions.ValidationException;
 import team6.BW_5.requestDTO.FatturaDTO;
+import team6.BW_5.requestDTO.FatturaFilterDTO;
 import team6.BW_5.requestDTO.FatturaPatchDTO;
 import team6.BW_5.requestDTO.StatoFatturaDTO;
 import team6.BW_5.responseDTO.FatturaCreatedDTO;
@@ -50,9 +52,10 @@ public class FatturaController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "data") String sortBy,
-            @RequestParam(defaultValue = "DESC") Sort.Direction direction
+            @RequestParam(defaultValue = "DESC") Sort.Direction direction,
+            @Valid @ModelAttribute FatturaFilterDTO filters
     ) {
-        return fatturaService.findAll(page, size, sortBy, direction);
+        return fatturaService.findAll(page, size, sortBy, direction, filters);
     }
 
     //TROVA LA FATTURA PER ID
