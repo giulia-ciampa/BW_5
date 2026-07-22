@@ -3,6 +3,8 @@ package team6.BW_5.exceptions;
 import org.springframework.data.core.PropertyReferenceException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -11,6 +13,7 @@ import team6.BW_5.responseDTO.ErrorsDTO;
 import team6.BW_5.responseDTO.ErrorsWithListDTO;
 
 import java.time.LocalDateTime;
+import java.util.stream.Collectors;
 
 @RestControllerAdvice
 public class ErrorsHandler {
@@ -43,6 +46,20 @@ public class ErrorsHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorsDTO handlePropertyReferenceException(PropertyReferenceException e) {
         return new ErrorsDTO(e.getMessage(), LocalDateTime.now());
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorsDTO handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
+
+        String message = e.getBindingResult()
+                .getFieldErrors()
+                .stream()
+                .map(FieldError::getDefaultMessage)
+                .collect(Collectors.joining(", "));
+
+        return new ErrorsDTO(message, LocalDateTime.now());
+
     }
 
     @ExceptionHandler(ValidationException.class)

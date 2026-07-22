@@ -3,40 +3,41 @@ package team6.BW_5.specifications;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 import team6.BW_5.entities.Cliente;
+import team6.BW_5.requestDTO.ClienteFilterDTO;
 
 import java.time.LocalDate;
 
 @Component
 public class ClienteSpecifications {
 
-    public Specification<Cliente> specificationClienteBuilder(String ragioneSociale, Double fatturatoMassimo, Double fatturatoMinimo, LocalDate dataInserimentoMax, LocalDate dataInserimentoMin, LocalDate dataUltimoContattoMax, LocalDate dataUltimoContattoMin) {
+    public Specification<Cliente> specificationClienteBuilder(ClienteFilterDTO filters) {
         Specification<Cliente> spec = (root, query, cb) -> cb.conjunction();
-        if (ragioneSociale != null && !ragioneSociale.isBlank()) {
-            spec = spec.and(hasRagioneSociale(ragioneSociale));
+        if (filters.ragioneSociale() != null && !filters.ragioneSociale().isBlank()) {
+            spec = spec.and(hasRagioneSociale(filters.ragioneSociale()));
         }
 
-        if (fatturatoMassimo != null && !fatturatoMassimo.isNaN()) {
-            spec = spec.and(fatturatoLessThanOrEqualTo(fatturatoMassimo));
+        if (filters.fatturatoMassimo() != null && !filters.fatturatoMassimo().isNaN()) {
+            spec = spec.and(fatturatoLessThanOrEqualTo(filters.fatturatoMassimo()));
         }
 
-        if (fatturatoMinimo != null && !fatturatoMinimo.isNaN()) {
-            spec = spec.and(fatturatoGreaterThanOrEqualTo(fatturatoMinimo));
+        if (filters.fatturatoMinimo() != null && !filters.fatturatoMinimo().isNaN()) {
+            spec = spec.and(fatturatoGreaterThanOrEqualTo(filters.fatturatoMinimo()));
         }
 
-        if (dataInserimentoMax != null) {
-            spec = spec.and(dataInserimentoBeforeThan(dataInserimentoMax));
+        if (filters.dataInserimentoMax() != null) {
+            spec = spec.and(dataInserimentoBeforeThan(filters.dataInserimentoMax()));
         }
 
-        if (dataInserimentoMin != null) {
-            spec = spec.and(dataInserimentoAfterThan(dataInserimentoMin));
+        if (filters.dataInserimentoMin() != null) {
+            spec = spec.and(dataInserimentoAfterThan(filters.dataInserimentoMin()));
         }
 
-        if (dataUltimoContattoMax != null) {
-            spec = spec.and(dataUltimoContattoBeforeThan(dataUltimoContattoMax));
+        if (filters.dataUltimoContattoMax() != null) {
+            spec = spec.and(dataUltimoContattoBeforeThan(filters.dataUltimoContattoMax()));
         }
 
-        if (dataUltimoContattoMin != null) {
-            spec = spec.and(dataUltimoContattoAfterThan(dataUltimoContattoMin));
+        if (filters.dataUltimoContattoMin() != null) {
+            spec = spec.and(dataUltimoContattoAfterThan(filters.dataUltimoContattoMin()));
         }
         return spec;
     }

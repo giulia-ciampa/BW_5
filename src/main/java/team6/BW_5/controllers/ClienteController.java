@@ -1,5 +1,6 @@
 package team6.BW_5.controllers;
 
+import jakarta.validation.Valid;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
@@ -12,12 +13,12 @@ import team6.BW_5.entities.Cliente;
 import team6.BW_5.entities.Utente;
 import team6.BW_5.exceptions.ValidationException;
 import team6.BW_5.requestDTO.ClienteDTO;
+import team6.BW_5.requestDTO.ClienteFilterDTO;
 import team6.BW_5.requestDTO.PatchAttivazioneClienteDTO;
 import team6.BW_5.responseDTO.ClienteCreatedDTO;
 import team6.BW_5.responseDTO.PatchAttivazioneClienteResponseDTO;
 import team6.BW_5.services.ClienteService;
 
-import java.time.LocalDate;
 import java.util.UUID;
 
 @RestController
@@ -31,8 +32,8 @@ public class ClienteController {
     }
 
     @GetMapping
-    public Page<Cliente> findAll(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size, @RequestParam(defaultValue = "dataInserimento") String sortBy, @RequestParam(defaultValue = "DESC") Sort.Direction direction, @RequestParam(required = false) String ragioneSociale, @RequestParam(required = false) Double fatturatoMassimo, @RequestParam(required = false) Double fatturatoMinimo, @RequestParam(required = false) LocalDate dataInserimentoMax, @RequestParam(required = false) LocalDate dataInserimentoMin, @RequestParam(required = false) LocalDate dataUltimoContattoMax, @RequestParam(required = false) LocalDate dataUltimoContattoMin) {
-        return clienteService.findAll(page, size, sortBy, direction, ragioneSociale, fatturatoMassimo, fatturatoMinimo, dataInserimentoMax, dataInserimentoMin, dataUltimoContattoMax, dataUltimoContattoMin);
+    public Page<Cliente> findAll(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size, @RequestParam(defaultValue = "dataInserimento") String sortBy, @RequestParam(defaultValue = "DESC") Sort.Direction direction, @Valid @ModelAttribute ClienteFilterDTO filters) {
+        return clienteService.findAll(page, size, sortBy, direction, filters);
     }
 
 

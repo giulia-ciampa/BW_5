@@ -14,11 +14,11 @@ import team6.BW_5.exceptions.RecordAlreadyExistsException;
 import team6.BW_5.exceptions.UnauthorizedException;
 import team6.BW_5.repositories.ClienteRepository;
 import team6.BW_5.requestDTO.ClienteDTO;
+import team6.BW_5.requestDTO.ClienteFilterDTO;
 import team6.BW_5.requestDTO.PatchAttivazioneClienteDTO;
 import team6.BW_5.responseDTO.PatchAttivazioneClienteResponseDTO;
 import team6.BW_5.specifications.ClienteSpecifications;
 
-import java.time.LocalDate;
 import java.util.UUID;
 
 @Service
@@ -48,13 +48,13 @@ public class ClienteService {
             throw new RecordAlreadyExistsException("Il cliente con PEC " + body.pec() + " esiste già.");
     }
 
-    public Page<Cliente> findAll(int page, int size, String sortBy, Sort.Direction direction, String ragioneSociale, Double fatturatoMassimo, Double fatturatoMinimo, LocalDate dataInserimentoMax, LocalDate dataInserimentoMin, LocalDate dataUltimoContattoMax, LocalDate dataUltimoContattoMin) {
+    public Page<Cliente> findAll(int page, int size, String sortBy, Sort.Direction direction, ClienteFilterDTO filters) {
         if (size <= 0) size = 10;
         if (size > 20) size = 20;
         if (page < 0) page = 0;
         Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortBy));
 
-        Specification<Cliente> spec = clienteSpecifications.specificationClienteBuilder(ragioneSociale, fatturatoMassimo, fatturatoMinimo, dataInserimentoMax, dataInserimentoMin, dataUltimoContattoMax, dataUltimoContattoMin);
+        Specification<Cliente> spec = clienteSpecifications.specificationClienteBuilder(filters);
 
         if (spec == null) {
             return clienteRepository.findAll(pageable);
