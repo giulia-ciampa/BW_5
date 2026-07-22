@@ -19,6 +19,7 @@ import team6.BW_5.requestDTO.StatoFatturaDTO;
 import team6.BW_5.responseDTO.FatturaCreatedDTO;
 import team6.BW_5.responseDTO.StatoFatturaUpdatedDTO;
 import team6.BW_5.services.FatturaService;
+import team6.BW_5.services.StatoFatturaService;
 
 import java.util.UUID;
 
@@ -27,9 +28,11 @@ import java.util.UUID;
 public class FatturaController {
 
     private final FatturaService fatturaService;
+    private final StatoFatturaService statoFatturaService;
 
-    public FatturaController(FatturaService fatturaService) {
+    public FatturaController(FatturaService fatturaService, StatoFatturaService statoFatturaService) {
         this.fatturaService = fatturaService;
+        this.statoFatturaService = statoFatturaService;
     }
 
     //SALVA FATTURA
@@ -101,7 +104,7 @@ public class FatturaController {
     }
 
 
-    //    //UPDATE STATO FATTURA
+    //UPDATE STATO FATTURA
     @PatchMapping("/{idFattura}/stato")
     public StatoFatturaUpdatedDTO updateStatoFattura(
             @PathVariable UUID idFattura,
@@ -115,4 +118,17 @@ public class FatturaController {
         );
     }
 
+    //TROVA FATTURE CON QUELLO STATO
+    @GetMapping("/stato/{nomeStato}")
+    public Page<Fattura> getFattureByStato(
+            @PathVariable String nomeStato,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "data") String sortBy) {
+
+        return fatturaService.findByStato(nomeStato, page, size, sortBy);
+    }
+
 }
+
+

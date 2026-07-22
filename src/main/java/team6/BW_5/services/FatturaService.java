@@ -105,7 +105,6 @@ public class FatturaService {
     public Fattura updateFattura(UUID id, FatturaDTO payload) {
         Fattura fatturaTrovata = findById(id);
 
-//SE FATTURA TROVATA, GET CLIENTE, SE NON E' ACTIVE SPARA ECCEZIONE
 
         if (!fatturaTrovata.getCliente().isAttivo())
             throw new ForbiddenException("Impossibile modificare la fattura! Il cliente con id " + fatturaTrovata.getCliente().getIdCliente() + " non è attivo");
@@ -171,8 +170,8 @@ public class FatturaService {
             throw new BadRequestException("Una fattura ANNULLATA non può più cambiare stato!");
         }
 
-        // 3. Chiediamo a StatoFatturaService di trovarci o crearci lo stato valido
-        StatoFattura nuovoStatoEntity = statoFatturaService.findByStatoOrCreate(nuovoStatoUpper);
+        // 3. Chiedo a StatoFatturaService di trovarci lo stato valido
+        StatoFattura nuovoStatoEntity = statoFatturaService.findByStato(nuovoStatoUpper);
 
         // 4. Assegniamo e salviamo
         fatturaTrovata.setStato(nuovoStatoEntity);
@@ -180,6 +179,18 @@ public class FatturaService {
 
     }
 
+    //TROVA FATTURE CON QUELLO STATO
+    public Page<Fattura> findByStato(String nomeStato, int page, int size, String sortBy) {
+        StatoFattura stato = statoFatturaService.findByStato(nomeStato);
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, sortBy));
+
+        return fatturaRepository.findByStato(stato, pageable);
+
+    }
+
 }
+
+
 
 
