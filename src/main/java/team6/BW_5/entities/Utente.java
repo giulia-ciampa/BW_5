@@ -1,6 +1,7 @@
 package team6.BW_5.entities;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,6 +20,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @NoArgsConstructor
+@JsonIgnoreProperties({"password", "enabled", "accountNonExpired", "accountNonLocked"})
 public class Utente implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -49,7 +51,7 @@ public class Utente implements UserDetails {
     )
     private List<AssegnazioneRuolo> assegnazioniRuolo = new ArrayList<>();
 
-    public Utente(String username, String email, String password, String nome, String cognome,  boolean isAttivo) {
+    public Utente(String username, String email, String password, String nome, String cognome, boolean isAttivo) {
         this.username = username;
         this.email = email;
         this.password = password;
