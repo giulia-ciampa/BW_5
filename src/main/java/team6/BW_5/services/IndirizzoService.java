@@ -1,5 +1,9 @@
 package team6.BW_5.services;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import team6.BW_5.entities.Comune;
 import team6.BW_5.entities.Indirizzo;
@@ -40,4 +44,13 @@ public class IndirizzoService {
                         via, civico, localita, cap, comune
                 ).orElseGet(() -> indirizzoRepository.save(new Indirizzo(via, civico, localita, cap, comune)));
     }
+
+    public Page<Indirizzo> findAll(int page, int size, String sortBy, Sort.Direction direction) {
+        if (size <= 0) size = 10;
+        if (size > 20) size = 20;
+        if (page < 0) page = 0;
+        Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortBy));
+        return indirizzoRepository.findAll(pageable);
+    }
+    
 }
