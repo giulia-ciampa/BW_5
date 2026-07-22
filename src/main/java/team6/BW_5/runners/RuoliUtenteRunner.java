@@ -1,11 +1,13 @@
 package team6.BW_5.runners;
 
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import team6.BW_5.exceptions.NotFoundException;
 import team6.BW_5.services.RuoloUtenteService;
 
 @Component
+@Order(1)
 public class RuoliUtenteRunner implements CommandLineRunner {
 
     private final RuoloUtenteService ruoloUtenteService;
