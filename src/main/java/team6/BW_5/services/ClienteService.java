@@ -13,6 +13,8 @@ import team6.BW_5.exceptions.RecordAlreadyExistsException;
 import team6.BW_5.exceptions.UnauthorizedException;
 import team6.BW_5.repositories.ClienteRepository;
 import team6.BW_5.requestDTO.ClienteDTO;
+import team6.BW_5.requestDTO.PatchAttivazioneClienteDTO;
+import team6.BW_5.responseDTO.PatchAttivazioneClienteResponseDTO;
 
 import java.util.UUID;
 
@@ -141,5 +143,14 @@ public class ClienteService {
             throw new UnauthorizedException("Non possiedi l'autorizzazione per cancellare questo cliente.");
 
         clienteRepository.delete(cliente);
+    }
+
+    public PatchAttivazioneClienteResponseDTO setIsAttivo(Utente utenteAutenticato, UUID clienteId, PatchAttivazioneClienteDTO body) {
+        Cliente cliente = findById(clienteId);
+        if (cliente.getUtente().getUtenteId().equals(utenteAutenticato.getUtenteId()) || utenteAutenticato.getAuthorities().contains("ADMIN")) {
+            cliente.setAttivo(body.isAttivo());
+            Cliente saved = clienteRepository.save(cliente);
+            return new PatchAttivazioneClienteResponseDTO(saved.getRagioneSociale(), saved.isAttivo());
+        } else throw new UnauthorizedException("Non possiedi le autorizzazioni per modificare questo cliente.");
     }
 }

@@ -57,7 +57,8 @@ public class Cliente {
     @ManyToOne
     @JoinColumn(name = "sede_operativa", nullable = false)
     private Indirizzo sedeOperativa;
-
+    @Column(name = "attivo", nullable = false)
+    private boolean isAttivo;
 
     public Cliente(String ragioneSociale, String partitaIva, String email, double fatturatoAnnuale, String pec, String telefono, String emailContatto, String nomeContatto, String cognomeContatto, String telefonoContatto, TipoAzienda tipo, Utente utente, Indirizzo sedeLegale, Indirizzo sedeOperativa) {
         this.ragioneSociale = ragioneSociale;
@@ -77,5 +78,6 @@ public class Cliente {
         this.logoAziendale = "https://ui-avatars.com/api/?name=" + ragioneSociale;
         this.sedeLegale = sedeLegale;
         this.sedeOperativa = sedeOperativa;
+        this.isAttivo = true;
     }
 }
