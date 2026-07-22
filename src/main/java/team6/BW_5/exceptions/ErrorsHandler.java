@@ -58,5 +58,15 @@ public class ErrorsHandler {
         return new ErrorsDTO(e.getMessage(), LocalDateTime.now());
     }
 
+    @ExceptionHandler(BadRequestException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorsDTO handleBadRequestException(BadRequestException e) {
+        return new ErrorsDTO(e.getMessage(), LocalDateTime.now());
+    }
 
+    @ExceptionHandler(ForbiddenException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public ErrorsDTO handleForbiddenException(ForbiddenException e) {
+        return new ErrorsDTO(e.getMessage(), LocalDateTime.now());
+    }
 }

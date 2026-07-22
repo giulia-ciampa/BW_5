@@ -10,6 +10,7 @@ import team6.BW_5.entities.Cliente;
 import team6.BW_5.entities.Fattura;
 import team6.BW_5.entities.StatoFattura;
 import team6.BW_5.exceptions.BadRequestException;
+import team6.BW_5.exceptions.ForbiddenException;
 import team6.BW_5.exceptions.NotFoundException;
 import team6.BW_5.repositories.FatturaRepository;
 import team6.BW_5.requestDTO.FatturaDTO;
@@ -37,9 +38,13 @@ public class FatturaService {
     //SALVA FATTURA
     @Transactional
     public Fattura saveFattura(FatturaDTO payload) {
+
         //1. trovo il cliente
         Cliente cliente = clienteService.findById(payload.idCliente());
-//FAI CONTROLLO SE IL CLIENTE NON E' ATTIVO LANCIA UNAUTHORIZED EXCEPTION
+
+        if (!cliente.isAttivo())
+            throw new ForbiddenException("impossibile salvare la fattura, il cliente con id " + cliente.getIdCliente() + " non è attivo");
+
         //2. stato iniziale
         StatoFattura statoIniziale = statoFatturaService.salvaEmissioneFattura();
 
@@ -83,7 +88,12 @@ public class FatturaService {
     //UPDATE -> POST
     public Fattura updateFattura(UUID id, FatturaDTO payload) {
         Fattura fatturaTrovata = findById(id);
+
 //SE FATTURA TROVATA, GET CLIENTE, SE NON E' ACTIVE SPARA ECCEZIONE
+
+        if (!fatturaTrovata.getCliente().isAttivo())
+            throw new ForbiddenException("Impossibile modificare la fattura! Il cliente con id " + fatturaTrovata.getCliente().getIdCliente() + " non è attivo");
+
         fatturaTrovata.setData(payload.data());
         fatturaTrovata.setImporto(payload.importo());
 
@@ -97,7 +107,11 @@ public class FatturaService {
     //UPDATE -> PATCH
     public Fattura patchFattura(UUID id, FatturaPatchDTO payload) {
         Fattura fatturaTrovata = findById(id);
+
         //ECCEZIONE CLIENTE NON ATTIVO
+        if (!fatturaTrovata.getCliente().isAttivo())
+            throw new ForbiddenException("Impossibile modificare la fattura! Il cliente con id " + fatturaTrovata.getCliente().getIdCliente() + " non è attivo");
+
         if (payload.data() != null) {
             fatturaTrovata.setData(payload.data());
         }
@@ -144,7 +158,7 @@ public class FatturaService {
         // 3. Chiediamo a StatoFatturaService di trovarci o crearci lo stato valido
         StatoFattura nuovoStatoEntity = statoFatturaService.findByStatoOrCreate(nuovoStatoUpper);
 
-        // 4. Assegniamo e salviAMO
+        // 4. Assegniamo e salviamo
         fatturaTrovata.setStato(nuovoStatoEntity);
         return fatturaRepository.save(fatturaTrovata);
 
