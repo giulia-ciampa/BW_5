@@ -62,6 +62,7 @@ public class ClienteController {
         if (validationResult.hasErrors()) {
             throw new ValidationException(validationResult.getFieldErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage).toList());
         }
+        
         return clienteService.updateCliente(body, utente, clienteId);
     }
 
