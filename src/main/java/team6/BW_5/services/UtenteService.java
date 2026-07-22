@@ -6,6 +6,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import team6.BW_5.entities.Utente;
 import team6.BW_5.exceptions.NotFoundException;
+import team6.BW_5.exceptions.UnauthorizedException;
 import team6.BW_5.repositories.UtenteRepository;
 import team6.BW_5.requestDTO.UtenteRequestDTO;
 import team6.BW_5.responseDTO.UtentePatchDTO;
@@ -56,18 +57,18 @@ public class UtenteService {
 
 
     //metodo per aggiornare utente
-    public Utente utenteAggiornato(UUID id, Utente utenteModificato) {
+    public Utente utenteAggiornato(UUID id, UtenteRequestDTO body, Utente utente) {
         Utente utenteEsistente = findById(id);
+        if (utenteEsistente.getUtenteId().equals(utente.getUtenteId()) || utente.getAuthorities().contains("ADMIN")) {
+            // setto i dati utente
+            utenteEsistente.setNome(body.nome());
+            utenteEsistente.setCognome(body.cognome());
+            utenteEsistente.setEmail(body.email());
+            utenteEsistente.setUsername(body.username());
 
-        // setto i dati utente
-        utenteEsistente.setNome(utenteModificato.getNome());
-        utenteEsistente.setCognome(utenteModificato.getCognome());
-        utenteEsistente.setEmail(utenteModificato.getEmail());
-        utenteEsistente.setUsername(utenteModificato.getUsername());
-        utenteEsistente.setAvatar(utenteModificato.getAvatar());
-        utenteEsistente.setPassword(utenteModificato.getPassword());
+            return utenteRepository.save(utenteEsistente);
+        } else throw new UnauthorizedException("Non sei abilitato ad aggiornare questo utente");
 
-        return utenteRepository.save(utenteEsistente);
     }
 
     //soft delete

@@ -1,11 +1,17 @@
 package team6.BW_5.controllers;
 
+import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import team6.BW_5.entities.Utente;
+import team6.BW_5.exceptions.ValidationException;
 import team6.BW_5.requestDTO.UtenteRequestDTO;
 import team6.BW_5.responseDTO.UtentePatchDTO;
 import team6.BW_5.responseDTO.UtenteResponseDTO;
@@ -59,17 +65,13 @@ public class UtenteController {
 
     //patch per aggiornare un utente esistente nel db tramite id
     @PutMapping("{id}")
-    @PreAuthorize("hasAuthority('ADMIN')")
-    public UtenteResponseDTO update(@PathVariable UUID id, @RequestBody UtenteRequestDTO utenteRequestDTO) {
-        Utente utenteAggiornato = new Utente(
-                utenteRequestDTO.username(),
-                utenteRequestDTO.email(),
-                utenteRequestDTO.password(),
-                utenteRequestDTO.nome(),
-                utenteRequestDTO.cognome(),
-                true
-        );
-        Utente utenteModificato = utenteService.utenteAggiornato(id, utenteAggiornato);
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('USER')")
+    // Todo:
+    public UtenteResponseDTO update(@PathVariable UUID id, @RequestBody @Validated UtenteRequestDTO  utenteRequestDTO, BindingResult validationResult, @AuthenticationPrincipal Utente utente) {
+
+        if(validationResult.hasErrors()) throw new ValidationException(validationResult.getFieldErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage).toList());
+
+        Utente utenteModificato = utenteService.utenteAggiornato(id, utenteRequestDTO, utente);
         return new UtenteResponseDTO(
                 utenteModificato.getUtenteId(),
                 utenteModificato.getUsername(),
