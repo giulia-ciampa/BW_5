@@ -87,4 +87,11 @@ public class FatturaController {
 
         return fatturaService.patchFattura(idFattura, payload);
     }
+
+    //DELETE
+    @DeleteMapping("/{idFattura}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteFattura(@PathVariable UUID idFattura) {
+        fatturaService.deleteFattura(idFattura);
+    }
 }

@@ -119,6 +119,12 @@ public class FatturaService {
         return fatturaRepository.save(fatturaTrovata);
     }
 
+    //DELETE
+    public void deleteFattura(UUID id) {
+        Fattura fatturaTrovata = findById(id);
+        fatturaRepository.delete(fatturaTrovata);
+    }
+
 }
 
 
