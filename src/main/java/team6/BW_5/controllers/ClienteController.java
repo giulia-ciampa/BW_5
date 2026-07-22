@@ -12,7 +12,9 @@ import team6.BW_5.entities.Cliente;
 import team6.BW_5.entities.Utente;
 import team6.BW_5.exceptions.ValidationException;
 import team6.BW_5.requestDTO.ClienteDTO;
+import team6.BW_5.requestDTO.PatchAttivazioneClienteDTO;
 import team6.BW_5.responseDTO.ClienteCreatedDTO;
+import team6.BW_5.responseDTO.PatchAttivazioneClienteResponseDTO;
 import team6.BW_5.services.ClienteService;
 
 import java.util.UUID;
@@ -60,13 +62,19 @@ public class ClienteController {
         if (validationResult.hasErrors()) {
             throw new ValidationException(validationResult.getFieldErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage).toList());
         }
+        
         return clienteService.updateCliente(body, utente, clienteId);
     }
 
-    @DeleteMapping("/me/{clienteId}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteOwnCliente(@AuthenticationPrincipal Utente utenteAutenticato, @PathVariable UUID clienteId) {
-        clienteService.deleteOwnCliente(utenteAutenticato, clienteId);
+//    @DeleteMapping("/me/{clienteId}")
+//    @ResponseStatus(HttpStatus.NO_CONTENT)
+//    public void deleteOwnCliente(@AuthenticationPrincipal Utente utenteAutenticato, @PathVariable UUID clienteId) {
+//        clienteService.deleteOwnCliente(utenteAutenticato, clienteId);
+//    }
+
+    @PatchMapping("/attivazione/{clienteId}")
+    public PatchAttivazioneClienteResponseDTO setIsAttivo(@AuthenticationPrincipal Utente utenteAutenticato, @PathVariable UUID clienteId, @RequestBody @Validated PatchAttivazioneClienteDTO body) {
+        return clienteService.setIsAttivo(utenteAutenticato, clienteId, body);
     }
 
 }
