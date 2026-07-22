@@ -75,7 +75,10 @@ public class ClienteController {
 //    }
 
     @PatchMapping("/attivazione/{clienteId}")
-    public PatchAttivazioneClienteResponseDTO setIsAttivo(@AuthenticationPrincipal Utente utenteAutenticato, @PathVariable UUID clienteId, @RequestBody @Validated PatchAttivazioneClienteDTO body) {
+    public PatchAttivazioneClienteResponseDTO setIsAttivo(@AuthenticationPrincipal Utente utenteAutenticato, @PathVariable UUID clienteId, @RequestBody @Validated PatchAttivazioneClienteDTO body, BindingResult validationResult) {
+        if (validationResult.hasErrors()) {
+            throw new ValidationException(validationResult.getFieldErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage).toList());
+        }
         return clienteService.setIsAttivo(utenteAutenticato, clienteId, body);
     }
 
