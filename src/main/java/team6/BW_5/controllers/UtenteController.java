@@ -61,7 +61,8 @@ public class UtenteController {
                 utenteRequestDTO.email(),
                 utenteRequestDTO.password(),
                 utenteRequestDTO.nome(),
-                utenteRequestDTO.cognome()
+                utenteRequestDTO.cognome(),
+                true
         );
         Utente utenteModificato = utenteService.utenteAggiornato(id, utenteAggiornato);
         return new UtenteResponseDTO(

@@ -39,7 +39,7 @@ public class UtenteService {
         if (utenteRepository.existsByUsername(body.username())) {
             throw new RuntimeException("L'username inserito è gia nei nostri database!");
         }
-        return utenteRepository.save(new Utente(body.username(), body.email(), bcrypt.encode(body.password()), body.nome(), body.cognome()));
+        return utenteRepository.save(new Utente(body.username(), body.email(), bcrypt.encode(body.password()), body.nome(), body.cognome(), true));
     }
 
     //metodo per eliminare utente byId

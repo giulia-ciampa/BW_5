@@ -40,6 +40,7 @@ public class Utente implements UserDetails {
     private String cognome;
 
     private String avatar;
+    private boolean isAttivo;
 
     @OneToMany(
             mappedBy = "utente",
@@ -47,13 +48,14 @@ public class Utente implements UserDetails {
     )
     private List<AssegnazioneRuolo> assegnazioniRuolo = new ArrayList<>();
 
-    public Utente(String username, String email, String password, String nome, String cognome) {
+    public Utente(String username, String email, String password, String nome, String cognome,  boolean isAttivo) {
         this.username = username;
         this.email = email;
         this.password = password;
         this.nome = nome;
         this.cognome = cognome;
         this.avatar = "https://ui-avatars.com/api/?name=" + nome + "+" + cognome;
+        this.isAttivo = isAttivo;
     }
 
     @Override
