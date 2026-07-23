@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import team6.BW_5.entities.Comune;
 import team6.BW_5.entities.Indirizzo;
 import team6.BW_5.repositories.IndirizzoRepository;
+import team6.BW_5.requestDTO.IndirizzoDTO;
 
 @Service
 public class IndirizzoService {
@@ -42,7 +43,12 @@ public class IndirizzoService {
                 .orElseGet(() -> save(new Indirizzo(via, civico, localita, cap, comune)));
     }
 
-    public Indirizzo save(Indirizzo indirizzo) {
+    public Indirizzo save(IndirizzoDTO body) {
+        Comune comune = comuneService.findByDenominazioneAndProvincia(body.denominazioneComune(), body.siglaProvincia());
+        return save(new Indirizzo(body.via(), body.civico(), body.localita(), body.cap(), comune));
+    }
+
+    private Indirizzo save(Indirizzo indirizzo) {
         return indirizzoRepository.save(indirizzo);
     }
 
