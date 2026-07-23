@@ -11,14 +11,15 @@ import team6.BW_5.repositories.UtenteRepository;
 import team6.BW_5.requestDTO.UtenteRequestDTO;
 import team6.BW_5.responseDTO.UtentePatchDTO;
 
+import java.util.Objects;
 import java.util.UUID;
 
 @Service
 public class UtenteService {
     private final PasswordEncoder bcrypt;
-    private UtenteRepository utenteRepository;
     private final AssegnazioneRuoloService assegnazioneRuoloService;
     private final RuoloUtenteService ruoloUtenteService;
+    private UtenteRepository utenteRepository;
 
     public UtenteService(UtenteRepository utenteRepository, PasswordEncoder bcrypt, AssegnazioneRuoloService assegnazioneRuoloService, RuoloUtenteService ruoloUtenteService) {
         this.utenteRepository = utenteRepository;
@@ -31,6 +32,7 @@ public class UtenteService {
     public Page<Utente> findAll(Pageable pageable) {
         return utenteRepository.findAll(pageable);
     }
+
     // find all per gli utenti attivi
     public Page<Utente> findAllAttivi(Pageable pageable) {
         return utenteRepository.findByIsAttivoTrue(pageable);
@@ -49,7 +51,7 @@ public class UtenteService {
         if (utenteRepository.existsByUsername(body.username())) {
             throw new RuntimeException("L'username inserito è gia nei nostri database!");
         }
-        Utente nuovoUtente= utenteRepository.save(new Utente(body.username(), body.email(), bcrypt.encode(body.password()), body.nome(), body.cognome(), true));
+        Utente nuovoUtente = utenteRepository.save(new Utente(body.username(), body.email(), bcrypt.encode(body.password()), body.nome(), body.cognome(), true));
         assegnazioneRuoloService.assegnaRuolo(nuovoUtente, ruoloUtenteService.findByNomeRuolo("USER"));
 
         return nuovoUtente;
@@ -59,7 +61,8 @@ public class UtenteService {
     //metodo per aggiornare utente
     public Utente utenteAggiornato(UUID id, UtenteRequestDTO body, Utente utente) {
         Utente utenteEsistente = findById(id);
-        if (utenteEsistente.getUtenteId().equals(utente.getUtenteId()) || utente.getAuthorities().contains("ADMIN")) {
+        if (utenteEsistente.getUtenteId().equals(utente.getUtenteId()) || utente.getAuthorities().stream()
+                .anyMatch(authority -> Objects.equals(authority.getAuthority(), "ADMIN"))) {
             // setto i dati utente
             utenteEsistente.setNome(body.nome());
             utenteEsistente.setCognome(body.cognome());
@@ -79,11 +82,13 @@ public class UtenteService {
 
         utenteRepository.save(utenteDaEliminare);
     }
-//find by email e se e attiva
+
+    //find by email e se e attiva
     public Utente findByEmail(String email) {
         return utenteRepository.findByEmailAndIsAttivoTrue(email)
                 .orElseThrow(() -> new NotFoundException("L'utente con l'email " + email + " non è stato trovato o non è attivo"));
     }
+
     public Utente findByUsername(String username) {
         return utenteRepository.findByUsernameAndIsAttivoTrue(username)
                 .orElseThrow(() -> new NotFoundException("L'utente con username " + username + " non è stato trovato o non è attivo"));

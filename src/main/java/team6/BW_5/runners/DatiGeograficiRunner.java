@@ -87,10 +87,9 @@ public class DatiGeograficiRunner implements CommandLineRunner {
                     codiceProvincia = Integer.parseInt(campi[0].trim());
                     progressivoComune = Integer.parseInt(campi[1].trim());
                 } catch (NumberFormatException e) {
-                    System.out.println("Riga scartata, dati numerici non validi: " + riga);
+                    System.out.println("Valore numerico non valido, sostituito con 0: " + riga);
                     codiceProvincia = 0;
                     progressivoComune = 0;
-                    continue;
                 }
                 String denominazioneComune = campi[2].trim();
                 String nomeProvinciaGrezzo = campi[3].trim();
