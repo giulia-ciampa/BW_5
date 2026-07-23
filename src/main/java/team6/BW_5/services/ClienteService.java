@@ -19,6 +19,7 @@ import team6.BW_5.requestDTO.PatchAttivazioneClienteDTO;
 import team6.BW_5.responseDTO.PatchAttivazioneClienteResponseDTO;
 import team6.BW_5.specifications.ClienteSpecifications;
 
+import java.util.Objects;
 import java.util.UUID;
 
 @Service
@@ -165,7 +166,8 @@ public class ClienteService {
 
     public PatchAttivazioneClienteResponseDTO setIsAttivo(Utente utenteAutenticato, UUID clienteId, PatchAttivazioneClienteDTO body) {
         Cliente cliente = findById(clienteId);
-        if (cliente.getUtente().getUtenteId().equals(utenteAutenticato.getUtenteId()) || utenteAutenticato.getAuthorities().contains("ADMIN")) {
+        if (cliente.getUtente().getUtenteId().equals(utenteAutenticato.getUtenteId()) || utenteAutenticato.getAuthorities().stream()
+                .anyMatch(authority -> Objects.equals(authority.getAuthority(), "ADMIN"))) {
             cliente.setAttivo(body.isAttivo());
             Cliente saved = clienteRepository.save(cliente);
             return new PatchAttivazioneClienteResponseDTO(saved.getRagioneSociale(), saved.isAttivo());
