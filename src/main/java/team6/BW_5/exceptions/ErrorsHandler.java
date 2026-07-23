@@ -108,4 +108,10 @@ public class ErrorsHandler {
         return new ErrorsDTO("Non hai i permessi necessari per eseguire questa operazione.", LocalDateTime.now());
     }
 
+    @ExceptionHandler(FileNotSupportedException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorsDTO handleFileNotSupportedException(FileNotSupportedException e) {
+        return new ErrorsDTO(e.getMessage(), LocalDateTime.now());
+    }
+
 }
