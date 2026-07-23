@@ -28,4 +28,17 @@ public class EmailSender {
 
         System.out.println(response.getBody());
     }
+
+    // metodo pe rinviare email custom esclusiva admin
+    public void sendAdminCustomEmail(String recipientEmail, String subject, String text) {
+        HttpResponse<JsonNode> response = Unirest.post("https://api.mailgun.net/v3/" + this.domainName + "/messages")
+                .basicAuth("api", this.apiKey)
+                .queryString("from", "admin@" + this.domainName)
+                .queryString("to", recipientEmail)
+                .queryString("subject", subject)
+                .queryString("text", text)
+                .asJson();
+
+        System.out.println(response.getBody());
+    }
 }

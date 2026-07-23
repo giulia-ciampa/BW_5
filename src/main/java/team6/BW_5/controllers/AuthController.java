@@ -58,8 +58,19 @@ public class AuthController {
 
         Utente utente = this.utenteService.findByEmail(payload.email());
 
-        // mess personalizzato
-        String messaggio = "Bentornato, " + utente.getNome() + "! Pronto a gestire le tue forniture?";
+        // controllo se tra le authorities c'è admin allora ha un mess a parte
+        boolean isAdmin = utente.getAuthorities().stream()
+                .anyMatch(auth -> auth.getAuthority().equals("admin") || auth.getAuthority().equals("ADMIN"));
+
+        String messaggio;
+        if (isAdmin) {
+            messaggio = "Bentornato, " + utente.getNome() + "! Pronto a gestire la piattaforma e gli utenti?";
+        } else {
+            messaggio = "Bentornato, " + utente.getNome() + "! È un piacere rivederti.";
+        }
+
         return new LoginResponseDTO(token, utente.getNome(), messaggio);
     }
-}
+
+    }
+
