@@ -3,6 +3,7 @@ package team6.BW_5.exceptions;
 import org.springframework.data.core.PropertyReferenceException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -100,4 +101,11 @@ public class ErrorsHandler {
     public ErrorsDTO handleForbiddenException(ForbiddenException e) {
         return new ErrorsDTO(e.getMessage(), LocalDateTime.now());
     }
+
+    @ExceptionHandler(AuthorizationDeniedException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public ErrorsDTO handleAuthorizationDeniedException(AuthorizationDeniedException e) {
+        return new ErrorsDTO("Non hai i permessi necessari per eseguire questa operazione.", LocalDateTime.now());
+    }
+
 }

@@ -6,6 +6,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import team6.BW_5.entities.Utente;
 import team6.BW_5.exceptions.NotFoundException;
+import team6.BW_5.exceptions.UnauthorizedException;
 import team6.BW_5.repositories.UtenteRepository;
 import team6.BW_5.requestDTO.UtenteRequestDTO;
 import team6.BW_5.responseDTO.UtentePatchDTO;
@@ -16,10 +17,14 @@ import java.util.UUID;
 public class UtenteService {
     private final PasswordEncoder bcrypt;
     private UtenteRepository utenteRepository;
+    private final AssegnazioneRuoloService assegnazioneRuoloService;
+    private final RuoloUtenteService ruoloUtenteService;
 
-    public UtenteService(UtenteRepository utenteRepository, PasswordEncoder bcrypt) {
+    public UtenteService(UtenteRepository utenteRepository, PasswordEncoder bcrypt, AssegnazioneRuoloService assegnazioneRuoloService, RuoloUtenteService ruoloUtenteService) {
         this.utenteRepository = utenteRepository;
         this.bcrypt = bcrypt;
+        this.assegnazioneRuoloService = assegnazioneRuoloService;
+        this.ruoloUtenteService = ruoloUtenteService;
     }
 
     //metodo per tornare lista di utenti con paginazione inclusa da usare nel getmapping del controller
@@ -44,23 +49,26 @@ public class UtenteService {
         if (utenteRepository.existsByUsername(body.username())) {
             throw new RuntimeException("L'username inserito è gia nei nostri database!");
         }
-        return utenteRepository.save(new Utente(body.username(), body.email(), bcrypt.encode(body.password()), body.nome(), body.cognome(), true));
+        Utente nuovoUtente= utenteRepository.save(new Utente(body.username(), body.email(), bcrypt.encode(body.password()), body.nome(), body.cognome(), true));
+        assegnazioneRuoloService.assegnaRuolo(nuovoUtente, ruoloUtenteService.findByNomeRuolo("USER"));
+
+        return nuovoUtente;
     }
 
 
     //metodo per aggiornare utente
-    public Utente utenteAggiornato(UUID id, Utente utenteModificato) {
+    public Utente utenteAggiornato(UUID id, UtenteRequestDTO body, Utente utente) {
         Utente utenteEsistente = findById(id);
+        if (utenteEsistente.getUtenteId().equals(utente.getUtenteId()) || utente.getAuthorities().contains("ADMIN")) {
+            // setto i dati utente
+            utenteEsistente.setNome(body.nome());
+            utenteEsistente.setCognome(body.cognome());
+            utenteEsistente.setEmail(body.email());
+            utenteEsistente.setUsername(body.username());
 
-        // setto i dati utente
-        utenteEsistente.setNome(utenteModificato.getNome());
-        utenteEsistente.setCognome(utenteModificato.getCognome());
-        utenteEsistente.setEmail(utenteModificato.getEmail());
-        utenteEsistente.setUsername(utenteModificato.getUsername());
-        utenteEsistente.setAvatar(utenteModificato.getAvatar());
-        utenteEsistente.setPassword(utenteModificato.getPassword());
+            return utenteRepository.save(utenteEsistente);
+        } else throw new UnauthorizedException("Non sei abilitato ad aggiornare questo utente");
 
-        return utenteRepository.save(utenteEsistente);
     }
 
     //soft delete

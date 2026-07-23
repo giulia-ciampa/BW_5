@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import team6.BW_5.entities.Cliente;
 import team6.BW_5.entities.Fattura;
@@ -14,7 +15,9 @@ import team6.BW_5.exceptions.ForbiddenException;
 import team6.BW_5.exceptions.NotFoundException;
 import team6.BW_5.repositories.FatturaRepository;
 import team6.BW_5.requestDTO.FatturaDTO;
+import team6.BW_5.requestDTO.FatturaFilterDTO;
 import team6.BW_5.requestDTO.FatturaPatchDTO;
+import team6.BW_5.specifications.FatturaSpecifications;
 
 import java.time.LocalDate;
 import java.util.UUID;
@@ -25,12 +28,17 @@ public class FatturaService {
     private final FatturaRepository fatturaRepository;
     private final StatoFatturaService statoFatturaService;
     private final ClienteService clienteService;
+    private FatturaSpecifications fatturaSpecifications;
 
 
-    public FatturaService(FatturaRepository fatturaRepository, StatoFatturaService statoFatturaService, ClienteService clienteService) {
+    public FatturaService(FatturaRepository fatturaRepository,
+                          StatoFatturaService statoFatturaService,
+                          ClienteService clienteService,
+                          FatturaSpecifications fatturaSpecifications) {
         this.fatturaRepository = fatturaRepository;
         this.statoFatturaService = statoFatturaService;
         this.clienteService = clienteService;
+        this.fatturaSpecifications = fatturaSpecifications;
     }
 
     //METODI
@@ -71,13 +79,21 @@ public class FatturaService {
     }
 
     //FIND ALL
-    public Page<Fattura> findAll(int page, int size, String sortBy, Sort.Direction direction) {
+    public Page<Fattura> findAll(int page, int size, String sortBy, Sort.Direction direction, FatturaFilterDTO filters) {
         if (size <= 0) size = 10;
         if (size > 20) size = 20;
         if (page < 0) page = 0;
         Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortBy));
-        return fatturaRepository.findAll(pageable);
+
+        Specification<Fattura> spec = fatturaSpecifications.specificationFatturaBuilder(filters);
+
+        if (spec == null) {
+            return fatturaRepository.findAll(pageable);
+        }
+
+        return fatturaRepository.findAll(spec, pageable);
     }
+
 
     //FINDBYID
     public Fattura findById(UUID id) {
@@ -89,7 +105,6 @@ public class FatturaService {
     public Fattura updateFattura(UUID id, FatturaDTO payload) {
         Fattura fatturaTrovata = findById(id);
 
-//SE FATTURA TROVATA, GET CLIENTE, SE NON E' ACTIVE SPARA ECCEZIONE
 
         if (!fatturaTrovata.getCliente().isAttivo())
             throw new ForbiddenException("Impossibile modificare la fattura! Il cliente con id " + fatturaTrovata.getCliente().getIdCliente() + " non è attivo");
@@ -155,8 +170,8 @@ public class FatturaService {
             throw new BadRequestException("Una fattura ANNULLATA non può più cambiare stato!");
         }
 
-        // 3. Chiediamo a StatoFatturaService di trovarci o crearci lo stato valido
-        StatoFattura nuovoStatoEntity = statoFatturaService.findByStatoOrCreate(nuovoStatoUpper);
+        // 3. Chiedo a StatoFatturaService di trovarci lo stato valido
+        StatoFattura nuovoStatoEntity = statoFatturaService.findByStato(nuovoStatoUpper);
 
         // 4. Assegniamo e salviamo
         fatturaTrovata.setStato(nuovoStatoEntity);
@@ -164,6 +179,18 @@ public class FatturaService {
 
     }
 
+    //TROVA FATTURE CON QUELLO STATO
+    public Page<Fattura> findByStato(String nomeStato, int page, int size, String sortBy) {
+        StatoFattura stato = statoFatturaService.findByStato(nomeStato);
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, sortBy));
+
+        return fatturaRepository.findByStato(stato, pageable);
+
+    }
+
 }
+
+
 
 
