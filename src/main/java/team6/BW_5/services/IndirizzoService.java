@@ -15,12 +15,10 @@ public class IndirizzoService {
     private final IndirizzoRepository indirizzoRepository;
     private final ComuneService comuneService;
 
-
     public IndirizzoService(IndirizzoRepository indirizzoRepository, ComuneService comuneService) {
         this.indirizzoRepository = indirizzoRepository;
         this.comuneService = comuneService;
     }
-
 
     public Indirizzo findByViaCivicoLocalitaOptionalAndComune(
             String via,
@@ -29,20 +27,23 @@ public class IndirizzoService {
             String cap,
             String denominazioneComune,
             String siglaProvincia
-
     ) {
         Comune comune = comuneService.findByDenominazioneAndProvincia(denominazioneComune, siglaProvincia);
+
         if (localita == null) {
             return indirizzoRepository
-                    .findByViaIgnoreCaseAndCivicoIgnoreCaseAndCapIgnoreCaseAndComune(
-                            via, civico, cap, comune
-                    ).orElseGet(() -> indirizzoRepository.save(new Indirizzo(via, civico, null, cap, comune)));
+                    .findByViaIgnoreCaseAndCivicoIgnoreCaseAndCapIgnoreCaseAndComune(via, civico, cap, comune)
+                    .orElseGet(() -> save(new Indirizzo(via, civico, null, cap, comune)));
         }
 
         return indirizzoRepository
                 .findByViaIgnoreCaseAndCivicoIgnoreCaseAndLocalitaIgnoreCaseAndCapIgnoreCaseAndComune(
-                        via, civico, localita, cap, comune
-                ).orElseGet(() -> indirizzoRepository.save(new Indirizzo(via, civico, localita, cap, comune)));
+                        via, civico, localita, cap, comune)
+                .orElseGet(() -> save(new Indirizzo(via, civico, localita, cap, comune)));
+    }
+
+    public Indirizzo save(Indirizzo indirizzo) {
+        return indirizzoRepository.save(indirizzo);
     }
 
     public Page<Indirizzo> findAll(int page, int size, String sortBy, Sort.Direction direction) {
@@ -52,5 +53,4 @@ public class IndirizzoService {
         Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortBy));
         return indirizzoRepository.findAll(pageable);
     }
-    
 }
