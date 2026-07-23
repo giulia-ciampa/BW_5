@@ -83,6 +83,7 @@ public class UtenteController {
     }
 
     @PatchMapping("/me/avatar")
+    @PreAuthorize("hasAnyAuthority('USER', 'ADMIN')")
     public Utente updateOwnProfilePic(@AuthenticationPrincipal Utente utente, @RequestParam("avatar") MultipartFile file) {
         return utenteService.updateProfilePic(utente, file);
     }
