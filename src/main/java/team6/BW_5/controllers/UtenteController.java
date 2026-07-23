@@ -9,6 +9,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import team6.BW_5.entities.Utente;
 import team6.BW_5.exceptions.ValidationException;
 import team6.BW_5.requestDTO.UtenteRequestDTO;
@@ -79,6 +80,11 @@ public class UtenteController {
                 utenteModificato.getNome(),
                 utenteModificato.getCognome()
         );
+    }
+
+    @PatchMapping("/me/avatar")
+    public Utente updateOwnProfilePic(@AuthenticationPrincipal Utente utente, @RequestParam("profile_picture") MultipartFile file) {
+        return utenteService.updateProfilePic(utente, file);
     }
 
     //aggiornamento parziale dto utente
