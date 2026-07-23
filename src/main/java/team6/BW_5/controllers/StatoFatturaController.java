@@ -1,5 +1,6 @@
 package team6.BW_5.controllers;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -19,6 +20,7 @@ public class StatoFatturaController {
 
     //VISUALIZZA STATI FATTURA
     @GetMapping
+    @PreAuthorize("hasAnyAuthority('USER', 'ADMIN')")
     public List<StatoFattura> getAllStatiFattura() {
         return statoFatturaService.findAll();
     }
