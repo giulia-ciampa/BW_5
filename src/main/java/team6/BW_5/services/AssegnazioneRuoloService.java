@@ -1,11 +1,11 @@
 package team6.BW_5.services;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import team6.BW_5.entities.AssegnazioneRuolo;
 import team6.BW_5.entities.RuoloUtente;
 import team6.BW_5.entities.Utente;
 import team6.BW_5.repositories.AssegnazioneRuoloRepository;
+
 import java.time.LocalDate;
 import java.util.List;
 
@@ -14,11 +14,9 @@ import java.util.List;
 public class AssegnazioneRuoloService {
 
 
-
-
     private final AssegnazioneRuoloRepository assegnazioneRuoloRepository;
 
-    public AssegnazioneRuoloService( AssegnazioneRuoloRepository assegnazioneRuoloRepository) {
+    public AssegnazioneRuoloService(AssegnazioneRuoloRepository assegnazioneRuoloRepository) {
         this.assegnazioneRuoloRepository = assegnazioneRuoloRepository;
     }
 

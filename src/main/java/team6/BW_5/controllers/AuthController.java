@@ -33,7 +33,9 @@ public class AuthController {
     public UtenteResponseDTO registrazione(@RequestBody @Validated UtenteRequestDTO body, BindingResult validationResult) {
 
         if (validationResult.hasErrors()) {
-            List<String> errorsList = validationResult.getFieldErrors().stream().map(fieldError -> fieldError.getDefaultMessage()).toList();
+            List<String> errorsList = validationResult.getFieldErrors().stream()
+                    .map(fieldError -> fieldError.getDefaultMessage())
+                    .toList();
             throw new ValidationException(errorsList);
         }
 
@@ -52,6 +54,12 @@ public class AuthController {
     //LOGIN
     @PostMapping("/login")
     public LoginResponseDTO login(@RequestBody LoginDTO payload) {
-        return new LoginResponseDTO(this.authService.checkCredentialsAndGenerateToken(payload));
+        String token = this.authService.checkCredentialsAndGenerateToken(payload);
+
+        Utente utente = this.utenteService.findByEmail(payload.email());
+
+        // mess personalizzato
+        String messaggio = "Bentornato, " + utente.getNome() + "! Pronto a gestire le tue forniture?";
+        return new LoginResponseDTO(token, utente.getNome(), messaggio);
     }
 }
