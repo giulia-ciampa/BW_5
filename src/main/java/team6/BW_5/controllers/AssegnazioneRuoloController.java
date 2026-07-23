@@ -22,13 +22,19 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/assegnazioni")
 public class AssegnazioneRuoloController {
-    @Autowired
-    private AssegnazioneRuoloService assegnazioneRuoloService;
-    @Autowired
-    private UtenteService utenteService;
 
-    @Autowired
-    private RuoloUtenteService ruoloUtenteService;
+    private final AssegnazioneRuoloService assegnazioneRuoloService;
+
+    private final UtenteService utenteService;
+
+
+    private final RuoloUtenteService ruoloUtenteService;
+
+    public AssegnazioneRuoloController(AssegnazioneRuoloService assegnazioneRuoloService, UtenteService utenteService, RuoloUtenteService ruoloUtenteService) {
+        this.assegnazioneRuoloService = assegnazioneRuoloService;
+        this.utenteService = utenteService;
+        this.ruoloUtenteService = ruoloUtenteService;
+    }
 
 
     // assegno un ruolo a un utente
