@@ -6,7 +6,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -64,12 +63,13 @@ public class UtenteController {
 
 
     //patch per aggiornare un utente esistente nel db tramite id
-    @PutMapping("{id}")
+    @PutMapping("/{id}")
     @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('USER')")
     // Todo:
-    public UtenteResponseDTO update(@PathVariable UUID id, @RequestBody @Validated UtenteRequestDTO  utenteRequestDTO, BindingResult validationResult, @AuthenticationPrincipal Utente utente) {
+    public UtenteResponseDTO update(@PathVariable UUID id, @RequestBody @Validated UtenteRequestDTO utenteRequestDTO, BindingResult validationResult, @AuthenticationPrincipal Utente utente) {
 
-        if(validationResult.hasErrors()) throw new ValidationException(validationResult.getFieldErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage).toList());
+        if (validationResult.hasErrors())
+            throw new ValidationException(validationResult.getFieldErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage).toList());
 
         Utente utenteModificato = utenteService.utenteAggiornato(id, utenteRequestDTO, utente);
         return new UtenteResponseDTO(
@@ -82,7 +82,7 @@ public class UtenteController {
     }
 
     //aggiornamento parziale dto utente
-    @PatchMapping("{id}")
+    @PatchMapping("/{id}")
     @PreAuthorize("hasAuthority('ADMIN')")
     public UtenteResponseDTO updatePartial(@PathVariable UUID id, @RequestBody UtentePatchDTO patchDTO) {
         Utente utenteModificato = utenteService.aggiornaParzialmenteUtente(id, patchDTO);
