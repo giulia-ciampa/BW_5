@@ -50,16 +50,8 @@ public class UtenteController {
 
     @GetMapping("/{id}")
     @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('USER')")
-    public UtenteResponseDTO findById(@PathVariable UUID id) {
-        Utente utente = utenteService.findById(id);
-        return new UtenteResponseDTO(
-                utente.getUtenteId(),
-                utente.getUsername(),
-                utente.getEmail(),
-                utente.getNome(),
-                utente.getCognome()
-
-        );
+    public Utente findById(@PathVariable UUID id) {
+        return utenteService.findById(id);
     }
 
 
@@ -85,6 +77,13 @@ public class UtenteController {
     @PatchMapping("/me/avatar")
     @PreAuthorize("hasAnyAuthority('USER', 'ADMIN')")
     public Utente updateOwnProfilePic(@AuthenticationPrincipal Utente utente, @RequestParam("avatar") MultipartFile file) {
+        return utenteService.updateProfilePic(utente, file);
+    }
+
+    @PatchMapping("/avatar/{utenteId}")
+    @PreAuthorize("hasAnyAuthority('ADMIN')")
+    public Utente updateUtenteProfilePic(@PathVariable UUID utenteId, @RequestParam("avatar") MultipartFile file) {
+        Utente utente = findById(utenteId);
         return utenteService.updateProfilePic(utente, file);
     }
 
