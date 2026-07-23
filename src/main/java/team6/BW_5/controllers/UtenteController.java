@@ -83,7 +83,7 @@ public class UtenteController {
     }
 
     @PatchMapping("/me/avatar")
-    public Utente updateOwnProfilePic(@AuthenticationPrincipal Utente utente, @RequestParam("profile_picture") MultipartFile file) {
+    public Utente updateOwnProfilePic(@AuthenticationPrincipal Utente utente, @RequestParam("avatar") MultipartFile file) {
         return utenteService.updateProfilePic(utente, file);
     }
 
