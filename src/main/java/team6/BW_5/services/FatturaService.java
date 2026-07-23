@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import team6.BW_5.entities.Cliente;
 import team6.BW_5.entities.Fattura;
 import team6.BW_5.entities.StatoFattura;
+import team6.BW_5.entities.Utente;
 import team6.BW_5.exceptions.BadRequestException;
 import team6.BW_5.exceptions.ForbiddenException;
 import team6.BW_5.exceptions.NotFoundException;
@@ -20,6 +21,7 @@ import team6.BW_5.requestDTO.FatturaPatchDTO;
 import team6.BW_5.specifications.FatturaSpecifications;
 
 import java.time.LocalDate;
+import java.util.Objects;
 import java.util.UUID;
 
 @Service
@@ -45,10 +47,22 @@ public class FatturaService {
 
     //SALVA FATTURA
     @Transactional
-    public Fattura saveFattura(FatturaDTO payload) {
+    public Fattura saveFattura(FatturaDTO payload, Utente utenteCorrente) {
 
         //1. trovo il cliente
         Cliente cliente = clienteService.findById(payload.idCliente());
+
+        // Verifico se l'utente è il proprietario DEL cliente
+        boolean isOwner = cliente.getUtente().getUtenteId().equals(utenteCorrente.getUtenteId());
+
+        // Verifico se l'utente ha l'authority ADMIN (o ROLE_ADMIN)
+        boolean isAdmin = utenteCorrente.getAuthorities().stream()
+                .anyMatch(authority -> authority.getAuthority().equals("ADMIN"));
+
+        // Se NON è il proprietario E NON è un admin, blocco la richiesta
+        if (!isOwner && !isAdmin) {
+            throw new ForbiddenException("Non hai i permessi per creare una fattura per questo cliente");
+        }
 
         if (!cliente.isAttivo())
             throw new ForbiddenException("impossibile salvare la fattura, il cliente con id " + cliente.getIdCliente() + " non è attivo");
@@ -96,32 +110,63 @@ public class FatturaService {
 
 
     //FINDBYID
-    public Fattura findById(UUID id) {
+    public Fattura findById(UUID id, Utente utenteCorrente) {
         Fattura fatturaTrovata = fatturaRepository.findById(id).orElseThrow(() -> new NotFoundException("la fattura con id " + id + " non è stata trovata"));
-        return fatturaTrovata;
+
+        boolean isOwner = fatturaTrovata.getCliente() != null
+                && fatturaTrovata.getCliente().getUtente() != null
+                && fatturaTrovata.getCliente().getUtente().getUtenteId().equals(utenteCorrente.getUtenteId());
+
+        if (isOwner || isAdmin(utenteCorrente)) {
+            return fatturaTrovata;
+        } else {
+            throw new ForbiddenException("Non hai i permessi per visualizzare questa fattura");
+        }
+
+
     }
 
-    //UPDATE -> POST
-    public Fattura updateFattura(UUID id, FatturaDTO payload) {
-        Fattura fatturaTrovata = findById(id);
+    //UPDATE -> PUT
+    public Fattura updateFattura(UUID id, Utente utenteCorrente, FatturaDTO payload) {
+
+        // Verifico l'authority Admin
+        boolean isAdmin = utenteCorrente.getAuthorities().stream()
+                .anyMatch(authority -> authority.getAuthority().equals("ADMIN"));
+
+        Fattura fatturaTrovata = findById(id, utenteCorrente);
 
 
         if (!fatturaTrovata.getCliente().isAttivo())
             throw new ForbiddenException("Impossibile modificare la fattura! Il cliente con id " + fatturaTrovata.getCliente().getIdCliente() + " non è attivo");
 
+        //Recupero il nuovo cliente dal payload
+        Cliente nuovoCliente = clienteService.findById(payload.idCliente());
+
+        boolean isOwnerOfNewClient = nuovoCliente.getUtente().getUtenteId().equals(utenteCorrente.getUtenteId());
+
+        if (!isOwnerOfNewClient && !isAdmin) {
+            throw new ForbiddenException("Non puoi assegnare questa fattura a un cliente non tuo!");
+        }
+
+        if (!nuovoCliente.isAttivo()) {
+            throw new ForbiddenException("Impossibile riassegnare la fattura a un cliente non attivo!");
+        }
+
         fatturaTrovata.setData(payload.data());
         fatturaTrovata.setImporto(payload.importo());
-
-        Cliente clienteTrovato = clienteService.findById(payload.idCliente());
-        fatturaTrovata.setCliente(clienteTrovato);
+        fatturaTrovata.setCliente(nuovoCliente);
 
         return fatturaRepository.save(fatturaTrovata);
 
     }
 
     //UPDATE -> PATCH
-    public Fattura patchFattura(UUID id, FatturaPatchDTO payload) {
-        Fattura fatturaTrovata = findById(id);
+    public Fattura patchFattura(UUID id, Utente utenteCorrente, FatturaPatchDTO payload) {
+
+        boolean isAdmin = utenteCorrente.getAuthorities().stream()
+                .anyMatch(authority -> authority.getAuthority().equals("ADMIN"));
+
+        Fattura fatturaTrovata = findById(id, utenteCorrente);
 
         //ECCEZIONE CLIENTE NON ATTIVO
         if (!fatturaTrovata.getCliente().isAttivo())
@@ -138,30 +183,49 @@ public class FatturaService {
 
         if (payload.idCliente() != null) {
 
-            Cliente clienteTrovato = clienteService.findById(payload.idCliente());
-            fatturaTrovata.setCliente(clienteTrovato);
+            // 1. Recupero il NUOVO cliente dal payload
+            Cliente nuovoCliente = clienteService.findById(payload.idCliente());
+
+            // 2. Controllo se il NUOVO cliente appartiene all'utente loggato
+            boolean isOwnerOfNewClient = nuovoCliente.getUtente().getUtenteId().equals(utenteCorrente.getUtenteId());
+
+            if (!isOwnerOfNewClient && !isAdmin) {
+                throw new ForbiddenException("Non puoi assegnare questa fattura a un cliente non tuo!");
+            }
+
+            // 3. Controllo se il nuovo cliente è attivo
+            if (!nuovoCliente.isAttivo()) {
+                throw new ForbiddenException("Impossibile riassegnare la fattura a un cliente non attivo!");
+            }
+
+            fatturaTrovata.setCliente(nuovoCliente);
         }
 
         return fatturaRepository.save(fatturaTrovata);
     }
 
     //DELETE
-    public void deleteFattura(UUID id) {
-        Fattura fatturaTrovata = findById(id);
+    public void deleteFattura(UUID id, Utente utenteCorrente) {
+        Fattura fatturaTrovata = findById(id, utenteCorrente);
         fatturaRepository.delete(fatturaTrovata);
     }
 
 
     //UPDATE STATO FATTURA
-    public Fattura updateStatoFattura(UUID fatturaId, String nuovoStato) {
+    public Fattura updateStatoFattura(UUID fatturaId, String nuovoStato, Utente utenteCorrente) {
 
         //1. recupero la fattura
-        Fattura fatturaTrovata = findById(fatturaId);
+        Fattura fatturaTrovata = findById(fatturaId, utenteCorrente);
+
+        //2. VERIFICA CLIENTE ATTIVO
+        if (!fatturaTrovata.getCliente().isAttivo()) {
+            throw new ForbiddenException("Impossibile modificare lo stato della fattura! Il cliente con id " + fatturaTrovata.getCliente().getIdCliente() + " non è attivo");
+        }
 
         String statoAttuale = fatturaTrovata.getStato().getStato();
         String nuovoStatoUpper = nuovoStato.toUpperCase();
 
-        //2. regole di transizione
+        //3. regole di transizione
         if ("PAGATA".equalsIgnoreCase(statoAttuale) && !"PAGATA".equalsIgnoreCase(nuovoStatoUpper)) {
             throw new BadRequestException("Una fattura già PAGATA non può cambiare stato!");
         }
@@ -170,10 +234,10 @@ public class FatturaService {
             throw new BadRequestException("Una fattura ANNULLATA non può più cambiare stato!");
         }
 
-        // 3. Chiedo a StatoFatturaService di trovarci lo stato valido
+        // 4. Chiedo a StatoFatturaService di trovarci lo stato valido
         StatoFattura nuovoStatoEntity = statoFatturaService.findByStato(nuovoStatoUpper);
 
-        // 4. Assegniamo e salviamo
+        // 5. Assegniamo e salviamo
         fatturaTrovata.setStato(nuovoStatoEntity);
         return fatturaRepository.save(fatturaTrovata);
 
@@ -187,6 +251,12 @@ public class FatturaService {
 
         return fatturaRepository.findByStato(stato, pageable);
 
+    }
+
+    //ISADMIN
+    private boolean isAdmin(Utente utente) {
+        return utente != null && utente.getAuthorities() != null && utente.getAuthorities().stream()
+                .anyMatch(authority -> Objects.equals(authority.getAuthority(), "ADMIN"));
     }
 
 }
