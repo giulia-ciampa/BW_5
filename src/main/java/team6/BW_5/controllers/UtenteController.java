@@ -9,6 +9,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import team6.BW_5.entities.Utente;
 import team6.BW_5.exceptions.ValidationException;
 import team6.BW_5.requestDTO.UtenteRequestDTO;
@@ -49,16 +50,8 @@ public class UtenteController {
 
     @GetMapping("/{id}")
     @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('USER')")
-    public UtenteResponseDTO findById(@PathVariable UUID id) {
-        Utente utente = utenteService.findById(id);
-        return new UtenteResponseDTO(
-                utente.getUtenteId(),
-                utente.getUsername(),
-                utente.getEmail(),
-                utente.getNome(),
-                utente.getCognome()
-
-        );
+    public Utente findById(@PathVariable UUID id) {
+        return utenteService.findById(id);
     }
 
 
@@ -80,6 +73,20 @@ public class UtenteController {
                 utenteModificato.getCognome()
         );
     }
+
+    @PatchMapping("/me/avatar")
+    @PreAuthorize("hasAnyAuthority('USER', 'ADMIN')")
+    public Utente updateOwnProfilePic(@AuthenticationPrincipal Utente utente, @RequestParam("avatar") MultipartFile file) {
+        return utenteService.updateProfilePic(utente, file);
+    }
+
+    @PatchMapping("/avatar/{utenteId}")
+    @PreAuthorize("hasAnyAuthority('ADMIN')")
+    public Utente updateUtenteProfilePic(@PathVariable UUID utenteId, @RequestParam("avatar") MultipartFile file) {
+        Utente utente = findById(utenteId);
+        return utenteService.updateProfilePic(utente, file);
+    }
+
 
     //aggiornamento parziale dto utente
     @PatchMapping("/{id}")

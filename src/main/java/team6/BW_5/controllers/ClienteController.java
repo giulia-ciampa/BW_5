@@ -10,6 +10,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import team6.BW_5.entities.Cliente;
 import team6.BW_5.entities.Utente;
 import team6.BW_5.exceptions.ValidationException;
@@ -74,11 +75,18 @@ public class ClienteController {
 //    }
 
     @PatchMapping("/attivazione/{clienteId}")
+    @PreAuthorize("hasAnyAuthority('USER', 'ADMIN')")
     public PatchAttivazioneClienteResponseDTO setIsAttivo(@AuthenticationPrincipal Utente utenteAutenticato, @PathVariable UUID clienteId, @RequestBody @Validated PatchAttivazioneClienteDTO body, BindingResult validationResult) {
         if (validationResult.hasErrors()) {
             throw new ValidationException(validationResult.getFieldErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage).toList());
         }
         return clienteService.setIsAttivo(utenteAutenticato, clienteId, body);
+    }
+
+    @PatchMapping("/logo/{clienteId}")
+    @PreAuthorize("hasAnyAuthority('USER', 'ADMIN')")
+    public Cliente setLogoCliente(@AuthenticationPrincipal Utente utenteAutenticato, @PathVariable UUID clienteId, @RequestParam("logo") MultipartFile logo) {
+        return clienteService.setLogoCliente(utenteAutenticato, clienteId, logo);
     }
 
 }

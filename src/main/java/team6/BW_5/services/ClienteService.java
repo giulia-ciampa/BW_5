@@ -1,14 +1,18 @@
 package team6.BW_5.services;
 
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import team6.BW_5.entities.Cliente;
 import team6.BW_5.entities.Indirizzo;
 import team6.BW_5.entities.Utente;
+import team6.BW_5.exceptions.FileNotSupportedException;
 import team6.BW_5.exceptions.NotFoundException;
 import team6.BW_5.exceptions.RecordAlreadyExistsException;
 import team6.BW_5.exceptions.UnauthorizedException;
@@ -19,6 +23,9 @@ import team6.BW_5.requestDTO.PatchAttivazioneClienteDTO;
 import team6.BW_5.responseDTO.PatchAttivazioneClienteResponseDTO;
 import team6.BW_5.specifications.ClienteSpecifications;
 
+import java.io.IOException;
+import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
 @Service
@@ -28,13 +35,15 @@ public class ClienteService {
     private final IndirizzoService indirizzoService;
     private final ComuneService comuneService;
     private final ClienteSpecifications clienteSpecifications;
+    private final Cloudinary fileUploader;
 
 
-    public ClienteService(ClienteRepository clienteRepository, IndirizzoService indirizzoService, ComuneService comuneService, ClienteSpecifications clienteSpecifications) {
+    public ClienteService(ClienteRepository clienteRepository, IndirizzoService indirizzoService, ComuneService comuneService, ClienteSpecifications clienteSpecifications, Cloudinary fileUploader) {
         this.clienteRepository = clienteRepository;
         this.indirizzoService = indirizzoService;
         this.comuneService = comuneService;
         this.clienteSpecifications = clienteSpecifications;
+        this.fileUploader = fileUploader;
     }
 
     public void verifyClienteConditions(ClienteDTO body) {
@@ -165,10 +174,34 @@ public class ClienteService {
 
     public PatchAttivazioneClienteResponseDTO setIsAttivo(Utente utenteAutenticato, UUID clienteId, PatchAttivazioneClienteDTO body) {
         Cliente cliente = findById(clienteId);
-        if (cliente.getUtente().getUtenteId().equals(utenteAutenticato.getUtenteId()) || utenteAutenticato.getAuthorities().contains("ADMIN")) {
+        if (cliente.getUtente().getUtenteId().equals(utenteAutenticato.getUtenteId()) || utenteAutenticato.getAuthorities().stream()
+                .anyMatch(authority -> Objects.equals(authority.getAuthority(), "ADMIN"))) {
             cliente.setAttivo(body.isAttivo());
             Cliente saved = clienteRepository.save(cliente);
             return new PatchAttivazioneClienteResponseDTO(saved.getRagioneSociale(), saved.isAttivo());
         } else throw new UnauthorizedException("Non possiedi le autorizzazioni per modificare questo cliente.");
+    }
+
+    public Cliente setLogoCliente(Utente utenteAutenticato, UUID clienteId, MultipartFile logo) {
+        Cliente cliente = findById(clienteId);
+        if (utenteAutenticato.getUtenteId().equals(cliente.getUtente().getUtenteId()) || utenteAutenticato.getAuthorities().stream()
+                .anyMatch(authority -> Objects.equals(authority.getAuthority(), "ADMIN"))) {
+            if (logo.getSize() > 10485760) throw new FileNotSupportedException("File's size can't be more than 10MB");
+            if (!(Objects.equals(logo.getContentType(), "image/jpeg") || Objects.equals(logo.getContentType(), "image/png")))
+                throw new FileNotSupportedException("Sono ammesse solo immagini jpeg o png ammesse");
+
+            try {
+                Map result = fileUploader.uploader().upload(logo.getBytes(), ObjectUtils.emptyMap());
+                String url = (String) result.get("secure_url");
+
+                cliente.setLogoAziendale(url);
+                clienteRepository.save(cliente);
+
+                return cliente;
+
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        } else throw new UnauthorizedException("Non possiedi i permessi per cambiare questo logo.");
     }
 }
