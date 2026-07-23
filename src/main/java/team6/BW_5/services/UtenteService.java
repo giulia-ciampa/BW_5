@@ -1,16 +1,22 @@
 package team6.BW_5.services;
 
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import team6.BW_5.entities.Utente;
+import team6.BW_5.exceptions.FileNotSupportedException;
 import team6.BW_5.exceptions.NotFoundException;
 import team6.BW_5.exceptions.UnauthorizedException;
 import team6.BW_5.repositories.UtenteRepository;
 import team6.BW_5.requestDTO.UtenteRequestDTO;
 import team6.BW_5.responseDTO.UtentePatchDTO;
 
+import java.io.IOException;
+import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -19,13 +25,16 @@ public class UtenteService {
     private final PasswordEncoder bcrypt;
     private final AssegnazioneRuoloService assegnazioneRuoloService;
     private final RuoloUtenteService ruoloUtenteService;
+    private final Cloudinary fileUploader;
     private UtenteRepository utenteRepository;
 
-    public UtenteService(UtenteRepository utenteRepository, PasswordEncoder bcrypt, AssegnazioneRuoloService assegnazioneRuoloService, RuoloUtenteService ruoloUtenteService) {
+
+    public UtenteService(UtenteRepository utenteRepository, PasswordEncoder bcrypt, AssegnazioneRuoloService assegnazioneRuoloService, RuoloUtenteService ruoloUtenteService, Cloudinary fileUploader) {
         this.utenteRepository = utenteRepository;
         this.bcrypt = bcrypt;
         this.assegnazioneRuoloService = assegnazioneRuoloService;
         this.ruoloUtenteService = ruoloUtenteService;
+        this.fileUploader = fileUploader;
     }
 
     //metodo per tornare lista di utenti con paginazione inclusa da usare nel getmapping del controller
@@ -121,6 +130,24 @@ public class UtenteService {
         return utenteRepository.save(utenteEsistente);
     }
 
+    public Utente updateProfilePic(Utente utente, MultipartFile file) {
+        if (file.getSize() > 10485760) throw new FileNotSupportedException("File's size can't be more than 10MB");
+        if (!(Objects.equals(file.getContentType(), "image/jpeg") || Objects.equals(file.getContentType(), "image/png")))
+            throw new FileNotSupportedException("Sono ammesse solo immagini jpeg o png ammesse");
+
+        try {
+            Map result = fileUploader.uploader().upload(file.getBytes(), ObjectUtils.emptyMap());
+            String url = (String) result.get("secure_url");
+
+            utente.setAvatar(url);
+            utenteRepository.save(utente);
+
+            return utente;
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }
 
 
