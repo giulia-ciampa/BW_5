@@ -33,7 +33,9 @@ public class AuthController {
     public UtenteResponseDTO registrazione(@RequestBody @Validated UtenteRequestDTO body, BindingResult validationResult) {
 
         if (validationResult.hasErrors()) {
-            List<String> errorsList = validationResult.getFieldErrors().stream().map(fieldError -> fieldError.getDefaultMessage()).toList();
+            List<String> errorsList = validationResult.getFieldErrors().stream()
+                    .map(fieldError -> fieldError.getDefaultMessage())
+                    .toList();
             throw new ValidationException(errorsList);
         }
 
@@ -52,6 +54,23 @@ public class AuthController {
     //LOGIN
     @PostMapping("/login")
     public LoginResponseDTO login(@RequestBody LoginDTO payload) {
-        return new LoginResponseDTO(this.authService.checkCredentialsAndGenerateToken(payload));
+        String token = this.authService.checkCredentialsAndGenerateToken(payload);
+
+        Utente utente = this.utenteService.findByEmail(payload.email());
+
+        // controllo se tra le authorities c'è admin allora ha un mess a parte
+        boolean isAdmin = utente.getAuthorities().stream()
+                .anyMatch(auth -> auth.getAuthority().equals("admin") || auth.getAuthority().equals("ADMIN"));
+
+        String messaggio;
+        if (isAdmin) {
+            messaggio = "Bentornato, " + utente.getNome() + "! Pronto a gestire la piattaforma e gli utenti?";
+        } else {
+            messaggio = "Bentornato, " + utente.getNome() + "! È un piacere rivederti.";
+        }
+
+        return new LoginResponseDTO(token, utente.getNome(), messaggio);
     }
-}
+
+    }
+
