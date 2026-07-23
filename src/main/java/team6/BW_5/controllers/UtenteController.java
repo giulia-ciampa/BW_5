@@ -88,6 +88,7 @@ public class UtenteController {
         return utenteService.updateProfilePic(utente, file);
     }
 
+
     //aggiornamento parziale dto utente
     @PatchMapping("/{id}")
     @PreAuthorize("hasAuthority('ADMIN')")
