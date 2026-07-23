@@ -33,7 +33,9 @@ public class AuthController {
     public UtenteResponseDTO registrazione(@RequestBody @Validated UtenteRequestDTO body, BindingResult validationResult) {
 
         if (validationResult.hasErrors()) {
-            List<String> errorsList = validationResult.getFieldErrors().stream().map(fieldError -> fieldError.getDefaultMessage()).toList();
+            List<String> errorsList = validationResult.getFieldErrors().stream()
+                    .map(fieldError -> fieldError.getDefaultMessage())
+                    .toList();
             throw new ValidationException(errorsList);
         }
 

@@ -10,6 +10,7 @@ import team6.BW_5.exceptions.UnauthorizedException;
 import team6.BW_5.repositories.UtenteRepository;
 import team6.BW_5.requestDTO.UtenteRequestDTO;
 import team6.BW_5.responseDTO.UtentePatchDTO;
+import team6.BW_5.tools.EmailSender;
 
 import java.util.UUID;
 
@@ -19,12 +20,14 @@ public class UtenteService {
     private UtenteRepository utenteRepository;
     private final AssegnazioneRuoloService assegnazioneRuoloService;
     private final RuoloUtenteService ruoloUtenteService;
+    private final EmailSender emailSender;
 
-    public UtenteService(UtenteRepository utenteRepository, PasswordEncoder bcrypt, AssegnazioneRuoloService assegnazioneRuoloService, RuoloUtenteService ruoloUtenteService) {
+    public UtenteService(UtenteRepository utenteRepository, PasswordEncoder bcrypt, AssegnazioneRuoloService assegnazioneRuoloService, RuoloUtenteService ruoloUtenteService, EmailSender emailSender) {
         this.utenteRepository = utenteRepository;
         this.bcrypt = bcrypt;
         this.assegnazioneRuoloService = assegnazioneRuoloService;
         this.ruoloUtenteService = ruoloUtenteService;
+        this.emailSender = emailSender;
     }
 
     //metodo per tornare lista di utenti con paginazione inclusa da usare nel getmapping del controller
@@ -51,8 +54,8 @@ public class UtenteService {
         }
         Utente nuovoUtente= utenteRepository.save(new Utente(body.username(), body.email(), bcrypt.encode(body.password()), body.nome(), body.cognome(), true));
         assegnazioneRuoloService.assegnaRuolo(nuovoUtente, ruoloUtenteService.findByNomeRuolo("USER"));
-
-        return nuovoUtente;
+emailSender.sendCustomRegistrationEmail(nuovoUtente, "Ciao " + nuovoUtente.getNome()+ "!" + " " + "Ti diamo il benvenuto ufficiale nella nostra piattaforma di servizi elettrici! Il tuo account è stato creato con successo con l'username: " + nuovoUtente.getUsername() + ". Da questo momento puoi accedere alla tua area riservata per monitorare i consumi, gestire le tue forniture e consultare le bollette in modo semplice e veloce. Grazie per aver scelto la nostra energia. A presto, Il team del Servizio Elettrico");
+return nuovoUtente;
     }
 
 
