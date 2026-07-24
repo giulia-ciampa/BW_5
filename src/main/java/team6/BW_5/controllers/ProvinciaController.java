@@ -1,5 +1,6 @@
 package team6.BW_5.controllers;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -18,6 +19,7 @@ public class ProvinciaController {
         this.provinciaService = provinciaService;
     }
 
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'USER')")
     @GetMapping
     public List<Provincia> findAll() {
         return provinciaService.findAll();

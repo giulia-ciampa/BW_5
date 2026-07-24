@@ -1,5 +1,6 @@
 package team6.BW_5.controllers;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,6 +22,7 @@ public class ComuneController {
     }
 
     @GetMapping("/{siglaProvincia}")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'USER')")
     public List<Comune> findBySiglaProvincia(@PathVariable String siglaProvincia) {
         if (siglaProvincia.isBlank()) throw new BadRequestException("La sigla provincia non può essere vuota");
         return comuneService.findBySiglaProvincia(siglaProvincia);
