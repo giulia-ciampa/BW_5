@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 import team6.BW_5.entities.Cliente;
 import team6.BW_5.entities.Utente;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -22,6 +23,8 @@ public interface ClienteRepository extends JpaRepository<Cliente, UUID>, JpaSpec
     boolean existsByPec(String pec);
 
     Page<Cliente> findByUtente(Utente utente, Pageable pageable);
+
+    List<Cliente> findByUtente(Utente utente);
 
 
     Optional<Cliente> findByEmail(String email);

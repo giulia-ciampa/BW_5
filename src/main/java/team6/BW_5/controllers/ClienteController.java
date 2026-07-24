@@ -21,6 +21,7 @@ import team6.BW_5.responseDTO.ClienteCreatedDTO;
 import team6.BW_5.responseDTO.PatchAttivazioneClienteResponseDTO;
 import team6.BW_5.services.ClienteService;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -48,6 +49,12 @@ public class ClienteController {
     public Page<Cliente> findOwnClienti(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size, @RequestParam(defaultValue = "dataInserimento") String sortBy, @RequestParam(defaultValue = "DESC") Sort.Direction direction, @AuthenticationPrincipal Utente utente, @Valid @ModelAttribute ClienteFilterDTO filters) {
         return clienteService.findOwnClienti(page, size, sortBy, direction, utente, filters);
     }
+
+    @GetMapping("/me/list")
+    public List<Cliente> findOwnClienti(@AuthenticationPrincipal Utente utente) {
+        return clienteService.findOwnClienti(utente);
+    }
+
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)

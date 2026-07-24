@@ -24,6 +24,7 @@ import team6.BW_5.responseDTO.PatchAttivazioneClienteResponseDTO;
 import team6.BW_5.specifications.ClienteSpecifications;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
@@ -97,6 +98,10 @@ public class ClienteService {
         }
         spec = spec.and(clienteSpecifications.byUtente(utente));
         return clienteRepository.findAll(spec, pageable);
+    }
+
+    public List<Cliente> findOwnClienti(Utente utente) {
+        return clienteRepository.findByUtente(utente);
     }
 
     public Cliente findByEmail(String email) {
