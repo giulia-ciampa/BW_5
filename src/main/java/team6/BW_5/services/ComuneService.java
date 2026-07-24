@@ -7,6 +7,8 @@ import team6.BW_5.exceptions.NotFoundException;
 import team6.BW_5.exceptions.RecordAlreadyExistsException;
 import team6.BW_5.repositories.ComuneRepository;
 
+import java.util.List;
+
 @Service
 public class ComuneService {
 
@@ -31,5 +33,11 @@ public class ComuneService {
     public Comune findByDenominazioneAndProvincia(String denominazione, String siglaProvincia) {
         Provincia provincia = provinciaService.findBySigla(siglaProvincia);
         return comuneRepository.findByDenominazioneAndProvincia(denominazione, provincia).orElseThrow(() -> new NotFoundException("Comune non trovato."));
+    }
+
+
+    public List<Comune> findBySiglaProvincia(String siglaProvincia) {
+        Provincia provincia = provinciaService.findBySigla(siglaProvincia);
+        return comuneRepository.findByProvincia(provincia);
     }
 }
